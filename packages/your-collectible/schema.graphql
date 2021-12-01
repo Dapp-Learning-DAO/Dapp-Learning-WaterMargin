@@ -1,0 +1,8 @@
+type DappLearningCollectible @entity {
+  id: ID!
+  tokenId: BigInt!
+  owner: Bytes!
+  isBurn: Boolean!
+  isAuction: Boolean!
+  isMintable: Boolean!
+}
