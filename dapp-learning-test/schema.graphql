@@ -4,5 +4,4 @@ type DappLearningCollectible @entity {
   owner: Bytes!
   isBurn: Boolean!
   isAuction: Boolean!
-  isMintable: Boolean!
 }

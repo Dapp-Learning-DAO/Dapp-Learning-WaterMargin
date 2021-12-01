@@ -83,13 +83,4 @@ export class DappLearningCollectible extends Entity {
   set isAuction(value: boolean) {
     this.set("isAuction", Value.fromBoolean(value));
   }
-
-  get isMintable(): boolean {
-    let value = this.get("isMintable");
-    return value.toBoolean();
-  }
-
-  set isMintable(value: boolean) {
-    this.set("isMintable", Value.fromBoolean(value));
-  }
 }
