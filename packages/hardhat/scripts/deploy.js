@@ -4,6 +4,13 @@ const chalk = require("chalk");
 const { config, ethers, tenderly, run } = require("hardhat");
 const { utils } = require("ethers");
 const R = require("ramda");
+const { MerkleTree } = require('merkletreejs');
+const keccak256 = require('keccak256');
+const addressList = require('./addressList.json');
+
+function hashToken(account) {
+  return Buffer.from(ethers.utils.solidityKeccak256(['address'], [account]).slice(2), 'hex')
+}
 
 
 const main = async () => {
@@ -23,6 +30,11 @@ const main = async () => {
 
   // deploy the contract with all the artworks forSale
   const yourCollectible = await deploy("DappLearningCollectible",[]) // <-- add in constructor args like line 19 vvvv
+  
+  // set MerkleRoot
+  let merkleTree = new MerkleTree(addressList.map(token => hashToken(token)), keccak256, { sortPairs: true });
+  await yourCollectible.setRoot(merkleTree.getHexRoot());
+
   const auction = await deploy("AuctionFixedPrice",[]) // <-- add in constructor args like line 19 vvvv
 
   console.log(

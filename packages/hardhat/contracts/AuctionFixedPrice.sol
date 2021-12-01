@@ -7,6 +7,12 @@ import "./IERC721Receiver.sol";
 
 contract AuctionFixedPrice is IERC721Receiver {
 
+    event StartAuction(address indexed owner, uint256 tokenID, uint256 price, uint256 duration);
+
+    event CancelAuction(address indexed owner, uint256 tokenID, uint256 price, uint256 duration);
+
+    event AuctionEnd(address indexed owner, address indexed bidder, uint256 tokenID, uint256 price, uint256 duration);
+
     struct auctionDetails {
         address seller;
         uint256 price;
@@ -42,6 +48,8 @@ contract AuctionFixedPrice is IERC721Receiver {
         address owner = msg.sender;
         IERC721(_nft).safeTransferFrom(owner, address(this), _tokenId);
         tokenToAuction[_nft][_tokenId] = _auction;
+
+        emit StartAuction(owner, _tokenId, _price, _duration);
     }
 
     /**
@@ -58,6 +66,8 @@ contract AuctionFixedPrice is IERC721Receiver {
         require(IERC20(auction.tokenAddress).transferFrom(msg.sender,seller,price), "erc 20 transfer failed!");
 
         IERC721(_nft).safeTransferFrom(address(this),msg.sender , _tokenId);
+
+        emit AuctionEnd(seller, msg.sender, _tokenId, price, auction.duration);
     }
 
     /**
@@ -69,6 +79,8 @@ contract AuctionFixedPrice is IERC721Receiver {
         require(auction.isActive);
         auction.isActive = false;
         IERC721(_nft).safeTransferFrom(address(this), auction.seller, _tokenId);
+
+        emit CancelAuction(auction.seller, _tokenId, auction.price, auction.duration);
     }
 
     function getTokenAuctionDetails(address _nft, uint256 _tokenId) public view returns (auctionDetails memory) {

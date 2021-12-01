@@ -27,6 +27,8 @@ contract DappLearningCollectible is ERC721URIStorage{
   
   uint256 private RANKLENGTH = 108;
 
+  uint256 public RANKCOUNTER;
+
   constructor() public ERC721("Dapp-Learning", "DLDAO") {
     ADMIN = msg.sender;
   }
@@ -44,6 +46,7 @@ contract DappLearningCollectible is ERC721URIStorage{
   function mintItem(uint seed, bytes32[] memory proof) public returns (uint256)
   {
     require(!claimedBitMap[msg.sender], 'Already Minted');
+    require(RANKCOUNTER <= 108, 'Distribution is over');
     require(MerkleProof.verify(proof, root, _leaf(msg.sender)), 'MerkleDistributor: Invalid proof.');
 
     _tokenIds.increment();
@@ -59,6 +62,8 @@ contract DappLearningCollectible is ERC721URIStorage{
     validRank[rank] = true;
 
     claimedBitMap[msg.sender] = true;
+
+    RANKCOUNTER++;
 
     return id;
   }
@@ -100,7 +105,7 @@ contract DappLearningCollectible is ERC721URIStorage{
   function getFreeRank(uint256 randomNumber) internal view returns (uint256) {
       uint256 loopIndex = randomNumber;
 
-      // 循环遍历，过滤已分配的 URL 
+      // 循环遍历，过滤已分配的 Rank 
       while (validRank[loopIndex]) {
         loopIndex = loopIndex +  1;
 

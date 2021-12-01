@@ -170,11 +170,11 @@ function App(props) {
 
 
   // keep track of a variable from the contract in the local React state:
-  const balance = useContractReader(readContracts,"YourCollectible", "balanceOf", [ address ])
+  const balance = useContractReader(readContracts,"DappLearningCollectible", "balanceOf", [ address ])
   if (DEBUG) console.log("🤗 balance:",balance)
 
   //📟 Listen for broadcast events
-  const transferEvents = useEventListener(readContracts, "YourCollectible", "Transfer", localProvider, 1);
+  const transferEvents = useEventListener(readContracts, "DappLearningCollectible", "Transfer", localProvider, 1);
   if (DEBUG) console.log("📟 Transfer events:",transferEvents)
 
 
