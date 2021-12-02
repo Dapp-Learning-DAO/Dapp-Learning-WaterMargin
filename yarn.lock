@@ -12321,6 +12321,14 @@ keccak256@^1.0.2:
     bn.js "^4.11.8"
     keccak "^3.0.1"
 
+keccak256@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.nlark.com/keccak256/download/keccak256-1.0.3.tgz#0a9c0383a9cda753a7351811cf69eaa607043366"
+  integrity sha1-CpwDg6nNp1OnNRgRz2nqpgcEM2Y=
+  dependencies:
+    bn.js "^4.11.8"
+    keccak "^3.0.1"
+
 keccak@3.0.1, keccak@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/keccak/-/keccak-3.0.1.tgz#ae30a0e94dbe43414f741375cff6d64c8bea0bff"
@@ -13335,7 +13343,7 @@ merkle-patricia-tree@^2.1.2, merkle-patricia-tree@^2.3.2:
     rlp "^2.0.0"
     semaphore ">=1.0.1"
 
-merkletreejs@^0.2.13:
+merkletreejs@^0.2.13, merkletreejs@^0.2.24:
   version "0.2.24"
   resolved "https://registry.yarnpkg.com/merkletreejs/-/merkletreejs-0.2.24.tgz#6dc52b3e0946846c25816216f1b60094a18a5e7a"
   integrity sha512-JUv2zSFuTpMj9uxqNXAOAQz6LKXL/AUalyuDzvqyf0fV09VeU7WjNDMDD+wbdtrA1mNEbV5w1XDWXMud8aNYTg==
