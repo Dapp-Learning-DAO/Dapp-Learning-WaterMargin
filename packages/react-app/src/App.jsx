@@ -184,7 +184,7 @@ function App(props) {
 
   const isInclaimList = useContractReader(readContracts, "DappLearningCollectible", "claimedBitMap", [address]);
 
-  console.log("isInclaimList", isInclaimList);
+  if (DEBUG) console.log("isInclaimList", isInclaimList);
 
   //📟 Listen for broadcast events
   const transferEvents = useEventListener(readContracts, "DappLearningCollectible", "Transfer", localProvider, 1);
@@ -205,8 +205,8 @@ function App(props) {
   */
 
   let networkDisplay = "";
-  console.log("selectedChainId=====", selectedChainId);
-  console.log("localChainId=====", localChainId);
+  // console.log("selectedChainId=====", selectedChainId);
+  // console.log("localChainId=====", localChainId);
   if (localChainId && selectedChainId && localChainId != selectedChainId) {
     networkDisplay = (
       <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
@@ -292,10 +292,14 @@ function App(props) {
   const [ipfsContent, setIpfsContent] = useState();
   const [yourBid, setYourBid] = useState({});
   const [galleryList, setGalleryList] = useState([]);
-  const { loading, error, data } = useQuery(dappLearningCollectibles);
+  const [timer, setTimer] = useState();
+  const { loading, error, data } = useQuery(dappLearningCollectibles, {
+    pollInterval: 500,
+  });
   // const { loading, error, data } = useQuery(getCurrentColl);
   const currentColl = useQuery(getCurrentColl, {
     variables: { address: address },
+    pollInterval: 500,
   });
 
   const [transferToAddresses, setTransferToAddresses] = useState({});
@@ -304,15 +308,19 @@ function App(props) {
 
   useEffect(() => {
     if (data) {
-      console.log("data=====", data);
-      updateYourCollectibles();
+      clearInterval(timer);
+      setTimer(
+        setInterval(() => {
+          updateYourCollectibles();
+        }, 1000),
+      );
     }
   }, [data, readContracts]);
 
-  if (currentColl?.data) {
-    console.log("currentColl data=====", currentColl?.data);
-    // setYourCollectibles(currentColl?.data?.dappLearningCollectibles);
-  }
+  // if (currentColl?.data) {
+  //   console.log("currentColl data=====", currentColl?.data);
+  //   // setYourCollectibles(currentColl?.data?.dappLearningCollectibles);
+  // }
 
   // console.log(utils.id(Object.keys(assets)[0]));
   // useEffect(() => {
@@ -355,13 +363,12 @@ function App(props) {
     let assetKeys = Object.keys(assets);
     if (!readContracts) return;
     try {
-      console.log(readContracts);
       // let forSaleArr = await Promise.all(assetKeys.map(a => readContracts.YourCollectible.forSale(utils.id(a))));
       let forSaleArr = data?.dappLearningCollectibles?.map(a => a.isAuction);
       assetUpdate = await Promise.all(
         data?.dappLearningCollectibles?.map((e, idx) => {
           const forSale = forSaleArr[idx];
-          if (forSale) return Promise.resolve({ id: assetKeys[idx], ...assets[assetKeys[idx]], forSale });
+          if (!forSale) return Promise.resolve({ id: assetKeys[idx], ...assets[assetKeys[idx]], forSale, ...e });
           return new Promise((res, rej) => {
             const { tokenId, owner } = data?.dappLearningCollectibles?.[idx];
             const nftAddress = readContracts.DappLearningCollectible.address;
@@ -374,7 +381,6 @@ function App(props) {
     } catch (error) {
       console.log(error);
     }
-    console.log("assetUpdate=====", assetUpdate);
     setLoadedAssets(assetUpdate);
   };
 
@@ -384,23 +390,27 @@ function App(props) {
   // let galleryList = [];
 
   useEffect(() => {
-    console.log(address);
-    console.log(loadedAssets);
     if (!address || !loadedAssets) return;
-
+    let list = [];
+    setGalleryList(null);
     for (let a in loadedAssets ? loadedAssets.slice(0, 6) : []) {
-      // console.log("loadedAssets",a,loadedAssets[a])
       let { auctionInfo, owner, id, forSale, name, external_url, image, description, isAuction } = loadedAssets[a];
 
       let cardActions = [];
       let auctionDetails = [];
       auctionDetails.push(null);
-      const deadline = new Date(auctionInfo.duration * 1000);
+      const deadline = new Date(auctionInfo?.duration * 1000);
       const isEnded = deadline <= new Date();
       const btnStyle = { marginBottom: "0px" };
-      const { isActive, seller, price, maxBidUser, maxBid } = auctionInfo;
-
-      console.log(address, owner, address * 1 === owner * 1, isAuction, id);
+      let isActive, seller, price, maxBidUser, maxBid;
+      if (auctionInfo) {
+        isActive = auctionInfo.isActive;
+        seller = auctionInfo.seller;
+        price = auctionInfo.price;
+        maxBidUser = auctionInfo.maxBidUser;
+        maxBid = auctionInfo.maxBid;
+      }
+      // const { isActive, seller, price, maxBidUser, maxBid } = auctionInfo;
       // address = address * 1;
       // owner = owner * 1;
 
@@ -422,11 +432,13 @@ function App(props) {
               </>
             )}
             {/* isActive && address === seller */}
+            {isAuction && !isEnded && (
+              <Button style={btnStyle} block ghost type="primary" onClick={() => completeAuction(id)}>
+                I want this
+              </Button>
+            )}
             {isAuction && address === seller && (
               <>
-                <Button style={btnStyle} block ghost type="primary" onClick={() => completeAuction(id)}>
-                  Complete auction
-                </Button>
                 <Button
                   style={{ ...btnStyle, fontWeight: "bold" }}
                   block
@@ -449,12 +461,10 @@ function App(props) {
       auctionDetails.push(
         isAuction ? (
           <div style={{ marginTop: "20px" }}>
-            <p style={{ fontWeight: "bold" }}>Auction is in progress</p>
-            <p style={{ margin: 0, marginBottom: "2px" }}>Minimal price is {utils.formatEther(price)} ETH</p>
-            <p style={{ marginTop: 0 }}>
-              {!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : "Auction has already ended"}
-            </p>
-            <div>
+            <p style={{ fontWeight: "bold" }}>{!isEnded ? `Auction is in progress` : "Auction has already ended"} </p>
+            <p style={{ margin: 0, marginBottom: "2px" }}>The price is {utils.formatEther(price)} ETH</p>
+            <p style={{ marginTop: 0 }}>{!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : ""}</p>
+            {/* <div>
               {maxBidUser === constants.AddressZero ? (
                 "Highest bid was not made yet"
               ) : (
@@ -488,12 +498,12 @@ function App(props) {
               >
                 Place a bid
               </Button>
-            </div>
+            </div> */}
           </div>
         ) : null,
       );
 
-      galleryList.push(
+      list.push(
         <div key={name} className={"cardBox"}>
           <div className={"imgBox"}>
             <div style={{ height: "100%" }}>
@@ -514,8 +524,7 @@ function App(props) {
         </div>,
       );
     }
-    console.log(galleryList);
-    setGalleryList(galleryList);
+    setGalleryList([...list]);
   }, [loadedAssets, address]);
 
   const startAuction = tokenUri => {
@@ -536,13 +545,13 @@ function App(props) {
 
   const completeAuction = async tokenId => {
     // const tokenId = await readContracts.YourCollectible.uriToTokenId(utils.id(tokenUri));
-    const nftAddress = writeContracts.DappLearningCollectible.address;
-    await tx(writeContracts.AuctionFixedPrice.executeSale(nftAddress, tokenId));
+    const nftAddress = readContracts.DappLearningCollectible.address;
+    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice });
     // updateYourCollectibles();
   };
 
   const cancelAuction = async tokenId => {
-    const nftAddress = writeContracts.DappLearningCollectible.address;
+    const nftAddress = readContracts.DappLearningCollectible.address;
     await tx(writeContracts.AuctionFixedPrice.cancelAution(nftAddress, tokenId));
   };
 
@@ -552,14 +561,21 @@ function App(props) {
     const tokenId = auctionToken;
 
     const auctionAddress = readContracts.AuctionFixedPrice.address;
-    const nftAddress = writeContracts.DappLearningCollectible.address;
+    const nftAddress = readContracts.DappLearningCollectible.address;
     await writeContracts.DappLearningCollectible.approve(auctionAddress, tokenId);
 
     const ethPrice = utils.parseEther(price.toString());
     const blockDuration = Math.floor(new Date().getTime() / 1000) + duration;
 
     await tx(
-      writeContracts.AuctionFixedPrice.createTokenAuction(nftAddress, tokenId, ethPrice, blockDuration, { gasPrice }),
+      writeContracts.AuctionFixedPrice.createTokenAuction(
+        nftAddress,
+        tokenId,
+        auctionAddress,
+        ethPrice,
+        blockDuration,
+        { gasPrice },
+      ),
     );
 
     const auctionInfo = await readContracts.AuctionFixedPrice.getTokenAuctionDetails(nftAddress, tokenId);
@@ -747,7 +763,9 @@ function App(props) {
                         <Button
                           onClick={() => {
                             console.log("writeContracts", writeContracts);
-                            tx(writeContracts.DappLearningCollectible.transferFrom(address, transferToAddresses[id], id));
+                            tx(
+                              writeContracts.DappLearningCollectible.transferFrom(address, transferToAddresses[id], id),
+                            );
                           }}
                         >
                           Transfer
