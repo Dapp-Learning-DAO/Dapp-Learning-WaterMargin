@@ -23,11 +23,12 @@
     "ethereum-waffle": "^3.1.1",
     "ethers": "^5.0.17",
     "hardhat": "^2.0.11",
+    "keccak256": "^1.0.2",
+    "merkletreejs": "^0.2.13",
     "node-watch": "^0.7.0",
     "qrcode-terminal": "^0.12.0",
     "ramda": "^0.27.1",
-    "keccak256": "^1.0.2",
-    "merkletreejs": "^0.2.13"
+    "replace": "^1.2.1"
   },
   "scripts": {
     "chain": "hardhat node",
