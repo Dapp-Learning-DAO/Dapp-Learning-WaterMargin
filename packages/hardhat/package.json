@@ -36,6 +36,7 @@
     "test": "hardhat test --network hardhat",
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.js",
+    "replace": "hardhat run scripts/replace.js",
     "postdeploy": "hardhat run scripts/publish.js",
     "watch": "node scripts/watch.js",
     "accounts": "hardhat accounts",
