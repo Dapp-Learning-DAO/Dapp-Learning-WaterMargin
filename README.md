@@ -24,7 +24,7 @@ PRIVATE_KEY=xxxxxxxxxxxxxxxx
 ```
 
 - 设置 MerkleList  
-因为 DappLearningCollectible 使用了 Merkle 空投方式, 在部署前需要设置空投的地址, 一遍后续进行测试使用.
+因为 DappLearningCollectible 使用了 Merkle 空投方式, 在部署前需要设置空投的地址, 以便后续进行测试使用.
 修改 packages/hardhat/scripts/addressList.json 文件, 在其中设置需要空投的地址 ( 即测试地址 )
 
 - 部署合约  
