@@ -42,6 +42,8 @@ const ipfs = ipfsAPI({ host: "ipfs.infura.io", port: "5001", protocol: "https" }
 
 console.log("📦 Assets: ", assets);
 
+console.log("proof", getProof("0x70997970C51812dc3A010C7d01b50e0d17dc79C8"));
+
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -433,7 +435,7 @@ function App(props) {
             )}
             {/* isActive && address === seller */}
             {isAuction && !isEnded && (
-              <Button style={btnStyle} block ghost type="primary" onClick={() => completeAuction(id)}>
+              <Button style={btnStyle} block ghost type="primary" onClick={() => completeAuction(id, price)}>
                 I want this
               </Button>
             )}
@@ -543,10 +545,13 @@ function App(props) {
     // updateYourCollectibles();
   };
 
-  const completeAuction = async tokenId => {
+  const completeAuction = async (tokenId, price) => {
     // const tokenId = await readContracts.YourCollectible.uriToTokenId(utils.id(tokenUri));
+    // return console.log(price);
     const nftAddress = readContracts.DappLearningCollectible.address;
-    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice });
+    const auctionAddress = readContracts.AuctionFixedPrice.address;
+    await tx(writeContracts.WETH.approve(auctionAddress, price));
+    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 });
     // updateYourCollectibles();
   };
 
@@ -562,20 +567,16 @@ function App(props) {
 
     const auctionAddress = readContracts.AuctionFixedPrice.address;
     const nftAddress = readContracts.DappLearningCollectible.address;
+    const WETH_Address = readContracts.WETH.address;
     await writeContracts.DappLearningCollectible.approve(auctionAddress, tokenId);
 
     const ethPrice = utils.parseEther(price.toString());
     const blockDuration = Math.floor(new Date().getTime() / 1000) + duration;
 
     await tx(
-      writeContracts.AuctionFixedPrice.createTokenAuction(
-        nftAddress,
-        tokenId,
-        auctionAddress,
-        ethPrice,
-        blockDuration,
-        { gasPrice },
-      ),
+      writeContracts.AuctionFixedPrice.createTokenAuction(nftAddress, tokenId, WETH_Address, ethPrice, blockDuration, {
+        gasPrice,
+      }),
     );
 
     const auctionInfo = await readContracts.AuctionFixedPrice.getTokenAuctionDetails(nftAddress, tokenId);
@@ -703,6 +704,7 @@ function App(props) {
               {isInclaimList !== undefined && !isInclaimList && (
                 <Button
                   block
+                  disabled={address && getProof(address).length === 0}
                   onClick={() => {
                     // console.log("gasPrice,", gasPrice);
                     // console.log(ethers.BigNumber.from(window.crypto.getRandomValues(new Uint32Array(1))[0]));
