@@ -4,8 +4,13 @@ const chalk = require("chalk");
 const { config, ethers } = require("hardhat");
 const { utils } = require("ethers");
 const R = require("ramda");
+require('dotenv').config();
 const ipfsAPI = require('ipfs-http-client');
-const ipfs = ipfsAPI({host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
+console.log(process.env.PROJECT_ID);
+const auth ='Basic ' + Buffer.from(process.env.PROJECT_ID + ':' + process.env.PROJECT_SECRET).toString('base64')
+const ipfs = ipfsAPI({host: 'ipfs.infura.io', port: '5001', protocol: 'https',headers: {
+  authorization: auth
+}})
 
 const main = async () => {
 
@@ -18,6 +23,7 @@ const main = async () => {
     console.log("  Uploading "+artwork[a].name+"...")
     const stringJSON = JSON.stringify(artwork[a])
     const uploaded = await ipfs.add(stringJSON)
+
     console.log("   "+artwork[a].name+" ipfs:",uploaded.path)
     allAssets[uploaded.path] = artwork[a]
   }

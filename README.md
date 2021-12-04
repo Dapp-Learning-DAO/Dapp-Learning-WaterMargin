@@ -19,8 +19,10 @@ yarn upload
 cd packages/hardhat
 cp .env.example .env
 
-## 修改 .env 内容，在其中填入 private_key
+## 修改 .env 内容，在其中填入 private_key, Infura ipfs 的 PROJECT_ID 和 PROJECT_SECRET
 PRIVATE_KEY=xxxxxxxxxxxxxxxx
+PROJECT_ID=yyyy
+PROJECT_SECRET=ZZZZ
 ```
 
 - 设置 MerkleList  
