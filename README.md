@@ -83,3 +83,54 @@ yarn deploy
     ```shell
     graph deploy --studio DappLearningCollectible
     ```
+
+- Mint NFT 
+只有在 packages/hardhat/scripts/addressList.json 文件中的账户地址才能进行 Mint 操作 
+
+- 拍卖  
+查看 Auction 合约中的 createTokenAuction 方法, 即拍卖方法, 可以发现其中调用了 IERC721(_nft).safeTransferFrom(owner, address(this), _tokenId), 即用户在执行拍卖前需要对 Auction 合约进行  NFT 的 approve 授权
+```
+function createTokenAuction(
+        address _nft,
+        uint256 _tokenId,
+        address _tokenAddress,
+        uint256 _price,
+        uint256 _duration
+    ) external {
+        require(msg.sender != address(0));
+        require(_nft != address(0));
+        require(_price > 0);
+        require(_duration > 0);
+        auctionDetails memory _auction = auctionDetails({
+        seller: msg.sender,
+        price: _price,
+        duration: _duration,
+        tokenAddress: _tokenAddress,
+        isActive: true
+        });
+        address owner = msg.sender;
+        IERC721(_nft).safeTransferFrom(owner, address(this), _tokenId);
+        tokenToAuction[_nft][_tokenId] = _auction;
+
+        emit StartAuction(owner, _tokenId, _price, _duration);
+    }
+```
+
+- 购买  
+同理在 purchaseNFTToken 接口, 即购买接口中, 会调用 IERC20(auction.tokenAddress).transferFrom(msg.sender,seller,price) , 即用户需要对 Auction 合约进行 ERC20 的 approve 授权, 这里是调用 WETH 的 approve 对 Auction 合约进行授权 
+```
+function purchaseNFTToken(address _nft, uint256 _tokenId) external {
+        auctionDetails storage auction = tokenToAuction[_nft][_tokenId];
+        require(auction.duration > block.timestamp, "Deadline already passed");
+        //require(auction.seller == msg.sender);
+        require(auction.isActive);
+        auction.isActive = false;
+        address seller = auction.seller;
+        uint price = auction.price;
+        require(IERC20(auction.tokenAddress).transferFrom(msg.sender,seller,price), "erc 20 transfer failed!");
+
+        IERC721(_nft).safeTransferFrom(address(this),msg.sender , _tokenId);
+
+        emit AuctionEnd(seller, msg.sender, _tokenId, price, auction.duration);
+    }
+```
