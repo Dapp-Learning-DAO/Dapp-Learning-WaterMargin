@@ -62,11 +62,9 @@ export default function Address(props) {
   const etherscanLink = blockExplorerLink(address, props.blockExplorer);
   if (props.minimized) {
     return (
-      <span style={{ verticalAlign: "middle" }}>
-        <a style={{ color: currentTheme == "light" ? "#222222" : "#ddd" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
-          <Blockies seed={address.toLowerCase()} size={8} scale={2} />
-        </a>
-      </span>
+      <a style={{ color: currentTheme == "light" ? "#222222" : "#ddd" }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
+        <Blockies seed={address.toLowerCase()} size={22} scale={2} />
+      </a>
     );
   }
 

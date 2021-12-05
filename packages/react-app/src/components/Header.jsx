@@ -8,6 +8,7 @@ export default function Header(props) {
     <div>
       <a href="https://dapp-learning.com" target="_blank" rel="noopener noreferrer">
         <PageHeader
+          className="PageHeader"
           title="⛵️ WaterMargin"
           subTitle="🚀 by Dapp-Learning DAO"
           style={{ cursor: "pointer" }}

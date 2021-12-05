@@ -438,7 +438,7 @@ function App(props) {
       // owner = owner * 1;
 
       cardActions.push(
-        <div className="cardAction">
+        <div className="cardAction" key={id}>
           <div className="actionBox">
             {!isAuction && address * 1 === owner * 1 && (
               <>
@@ -483,10 +483,12 @@ function App(props) {
 
       auctionDetails.push(
         isAuction ? (
-          <div style={{ marginTop: "20px" }}>
-            <p style={{ fontWeight: "bold" }}>{!isEnded ? `Auction is in progress` : "Auction has already ended"} </p>
-            <p style={{ margin: 0, marginBottom: "2px" }}>The price is {utils.formatEther(price)} WETH</p>
-            <p style={{ marginTop: 0 }}>{!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : ""}</p>
+          <div style={{ marginTop: "4px", textAlign: 'left' }} key={id}>
+            <div style={{ fontWeight: "bold", display: 'flex', padding: '0 8px' }}>
+              <span style={{flex: 1}}>{!isEnded ? `in progress` : "ended"}</span>
+              <span>price: <span style={{color: 'rgb(24, 144, 255)', fontSize: '16px'}}>{utils.formatEther(price)}</span> WETH</span>
+            </div>
+            <div style={{ marginBottom: 4 }}>{!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : ""}</div>
             {/* <div>
               {maxBidUser === constants.AddressZero ? (
                 "Highest bid was not made yet"
@@ -526,7 +528,7 @@ function App(props) {
         ) : null,
       );
 
-      list.push(
+      list.unshift(
         <div key={name} className={"cardBox"}>
           <div className={"imgBox"}>
             <div style={{ height: "100%" }}>
@@ -535,12 +537,11 @@ function App(props) {
           </div>
           <div className={"infoBox"}>
             {owner && (
-              <div>
-                owned by:{" "}
+              <div className="avatar">
                 <Address address={owner} ensProvider={mainnetProvider} blockExplorer={blockExplorer} minimized={true} />
               </div>
             )}
-            <div style={{ opacity: 0.77 }}>{description}</div>
+            <div style={{ opacity: 0.77, fontSize: '16px', fontWeight: 'bold' }}>{description}</div>
           </div>
           {auctionDetails}
           <div>{cardActions}</div>
@@ -660,7 +661,7 @@ function App(props) {
       {networkDisplay}
 
       <BrowserRouter>
-        <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
+        <Menu className="nav-bar" style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
             <Link
               onClick={() => {
@@ -721,7 +722,7 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
-            <div style={{ maxWidth: 1024, margin: "auto", marginTop: 32, paddingBottom: 56 }}>
+            <div style={{ maxWidth: '1280', margin: "auto", marginTop: 32, paddingBottom: 108 }}>
               {/* <Button
                 disabled={galleryList.length === 0}
                 onClick={updateYourCollectibles}
@@ -730,7 +731,7 @@ function App(props) {
                 Update collectibles
               </Button> */}
 
-              <StackGrid columnWidth={300} gutterWidth={16} gutterHeight={16}>
+              <StackGrid columnWidth={416} gutterWidth={16} gutterHeight={32}>
                 {galleryList}
               </StackGrid>
             </div>
@@ -893,7 +894,7 @@ function App(props) {
       {/* <ThemeSwitch /> */}
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10, zIndex: 90 }}>
         <Row align="middle" gutter={[4, 4]}>
           <Col span={8}>
             <Ramp price={price} address={address} networks={NETWORKS} />
