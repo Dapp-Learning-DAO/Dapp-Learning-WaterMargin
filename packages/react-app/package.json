@@ -4,7 +4,7 @@
   "homepage": ".",
   "browserslist": {
     "production": [
-      ">0.2%",
+      "last 1 version",
       "not dead",
       "not op_mini all"
     ],
@@ -90,7 +90,7 @@
     "extends": "react-app"
   },
   "scripts": {
-    "build": "react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build  --profile",
     "eject": "react-scripts eject",
     "start": "react-scripts start",
     "test": "react-scripts test",

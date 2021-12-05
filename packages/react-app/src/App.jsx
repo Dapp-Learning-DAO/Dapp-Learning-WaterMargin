@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import "antd/dist/antd.css";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
-import { LinkOutlined, CoffeeOutlined, PrinterOutlined, FlagOutlined } from "@ant-design/icons";
+import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
 import "./App.css";
-import { Row, Col, Button, Menu, Alert, Input, List, Card, Switch as SwitchD, Modal, InputNumber, Tooltip } from "antd";
+import { Row, Col, Button, Menu, Alert, List, Card, Modal, InputNumber } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
@@ -19,19 +19,19 @@ import {
   useBalance,
   useExternalContractLoader,
 } from "./hooks";
-import { Header, Account, Faucet, Ramp, Contract, GasGauge, Address, AddressInput, ThemeSwitch } from "./components";
+import { Header, Account, Faucet, Ramp, Contract, GasGauge, Address, AddressInput } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther, parseEther } from "@ethersproject/units";
-import { utils, constants, ethers } from "ethers";
+import { utils } from "ethers";
 //import Hints from "./Hints";
-import { Hints, ExampleUI, Subgraph } from "./views";
-import { useThemeSwitcher } from "react-css-theme-switcher";
+// import { Hints, ExampleUI, Subgraph } from "./views";
+// import { useThemeSwitcher } from "react-css-theme-switcher";
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from "./constants";
 import StackGrid from "react-stack-grid";
 import ReactJson from "react-json-view";
 import assets from "./assets.js";
 import { FireOutlined } from "@ant-design/icons";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import getProof from "./utils/getMerkleTree";
 import { dappLearningCollectibles, getCurrentColl } from "./gql";
 
@@ -89,18 +89,18 @@ const STARTING_JSON = {
 
 //helper function to "Get" from IPFS
 // you usually go content.toString() after this...
-const getFromIPFS = async hashToGet => {
-  for await (const file of ipfs.get(hashToGet)) {
-    console.log(file.path);
-    if (!file.content) continue;
-    const content = new BufferList();
-    for await (const chunk of file.content) {
-      content.append(chunk);
-    }
-    console.log(content);
-    return content;
-  }
-};
+// const getFromIPFS = async hashToGet => {
+//   for await (const file of ipfs.get(hashToGet)) {
+//     console.log(file.path);
+//     if (!file.content) continue;
+//     const content = new BufferList();
+//     for await (const chunk of file.content) {
+//       content.append(chunk);
+//     }
+//     console.log(content);
+//     return content;
+//   }
+// };
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -198,7 +198,7 @@ function App(props) {
   //
   // 🧠 This effect will update yourCollectibles by polling when your balance changes
   //
-  const yourBalance = balance && balance.toNumber && balance.toNumber();
+  // const yourBalance = balance && balance.toNumber && balance.toNumber();
   const [yourCollectibles, setYourCollectibles] = useState();
 
   /*
@@ -296,14 +296,15 @@ function App(props) {
   const [galleryList, setGalleryList] = useState([]);
   const [timer, setTimer] = useState();
   const [id_rank, setId_rank] = useState();
+  let assetKeys = Object.keys(assets);
 
   const { loading, error, data } = useQuery(dappLearningCollectibles, {
-    pollInterval: 500,
+    pollInterval: 800,
   });
   // const { loading, error, data } = useQuery(getCurrentColl);
   const currentColl = useQuery(getCurrentColl, {
     variables: { address: address },
-    pollInterval: 500,
+    pollInterval: 800,
   });
 
   const [transferToAddresses, setTransferToAddresses] = useState({});
@@ -366,7 +367,6 @@ function App(props) {
 
   const updateYourCollectibles = async () => {
     let assetUpdate = [];
-    let assetKeys = Object.keys(assets);
     if (!readContracts) return;
     try {
       // let forSaleArr = await Promise.all(assetKeys.map(a => readContracts.YourCollectible.forSale(utils.id(a))));
@@ -748,8 +748,9 @@ function App(props) {
                 // dataSource={yourCollectibles}
                 dataSource={currentColl?.data?.dappLearningCollectibles}
                 renderItem={item => {
+                  item = { ...item, ...assets[assetKeys[id_rank[item.tokenId]]] };
                   // const id = item.id.toNumber();
-                  const id = item.id * 1;
+                  const id = id_rank[item.tokenId] * 1;
                   return (
                     <List.Item key={id + "_" + item.uri + "_" + item.owner}>
                       <Card
