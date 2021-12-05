@@ -604,7 +604,13 @@ function App(props) {
     const auctionAddress = readContracts.AuctionFixedPrice.address;
     const nftAddress = readContracts.DappLearningCollectible.address;
     const WETH_Address = readContracts.WETH.address;
-    await writeContracts.DappLearningCollectible.approve(auctionAddress, tokenId);
+    const isApproved = await readContracts.DappLearningCollectible.isApprovedForAll(address, auctionAddress);
+    if (!isApproved) {
+      await tx(writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true))
+        .catch((err) => {
+          console.error(err);
+        });
+    }
 
     const ethPrice = utils.parseEther(price.toString());
     const blockDuration = Math.floor(new Date().getTime() / 1000) + duration;
