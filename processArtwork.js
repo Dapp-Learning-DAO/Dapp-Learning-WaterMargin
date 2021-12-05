@@ -11,7 +11,7 @@ async function main() {
       name: row[2],
       description: `${row[1]}-${row[2]}-${row[4]}`,
       external_url: `https://watermargin.dapp-learning/?id=${row[0]}`,
-      image: `https://watermargin.dapp-learning/${row[0]}.jpg`,
+      image: `https://watermargin.dapp-learning/WaterMargin/${row[0]}.jpg`,
       attributes: [
         {
           trait_type: "Rank",
