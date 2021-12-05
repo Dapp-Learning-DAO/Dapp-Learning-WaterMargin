@@ -464,7 +464,7 @@ function App(props) {
         isAuction ? (
           <div style={{ marginTop: "20px" }}>
             <p style={{ fontWeight: "bold" }}>{!isEnded ? `Auction is in progress` : "Auction has already ended"} </p>
-            <p style={{ margin: 0, marginBottom: "2px" }}>The price is {utils.formatEther(price)} ETH</p>
+            <p style={{ margin: 0, marginBottom: "2px" }}>The price is {utils.formatEther(price)} WETH</p>
             <p style={{ marginTop: 0 }}>{!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : ""}</p>
             {/* <div>
               {maxBidUser === constants.AddressZero ? (
