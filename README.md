@@ -136,3 +136,9 @@ function purchaseNFTToken(address _nft, uint256 _tokenId) external {
         emit AuctionEnd(seller, msg.sender, _tokenId, price, auction.duration);
     }
 ```
+
+## deploy address
+
+- Auction 0x9089F4F3a19bdF13816e7c940d9376De32CFE2Fd
+- NFT 0x4a4093dae325a87c18d26e7ccd5c123b63063b6a
+- WEH 0xc778417E063141139Fce010982780140Aa0cD5Ab

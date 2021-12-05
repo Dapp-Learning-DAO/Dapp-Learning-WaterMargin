@@ -22,7 +22,7 @@ import {
 import { Header, Account, Faucet, Ramp, Contract, GasGauge, Address, AddressInput } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther, parseEther } from "@ethersproject/units";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 //import Hints from "./Hints";
 // import { Hints, ExampleUI, Subgraph } from "./views";
 // import { useThemeSwitcher } from "react-css-theme-switcher";
@@ -528,7 +528,7 @@ function App(props) {
         ) : null,
       );
 
-      list.unshift(
+      list.push(
         <div key={name} className={"cardBox"}>
           <div className={"imgBox"}>
             <div style={{ height: "100%" }}>
@@ -570,9 +570,23 @@ function App(props) {
   const completeAuction = async (tokenId, price) => {
     // const tokenId = await readContracts.YourCollectible.uriToTokenId(utils.id(tokenUri));
     // return console.log(price);
+
+    // check balance
+    const balance = await readContracts.WETH.balanceOf(address);
+    console.warn(balance.toString())
+    if (balance < price) {
+      // TODO: alert not enough money
+      return;
+    }
+
     const nftAddress = readContracts.DappLearningCollectible.address;
     const auctionAddress = readContracts.AuctionFixedPrice.address;
-    await tx(writeContracts.WETH.approve(auctionAddress, price));
+    const allowance = await readContracts.WETH.allowance(address, auctionAddress);
+    if (allowance < price) {
+      await tx(writeContracts.WETH.approve(auctionAddress, BigNumber.from("0xffffffffffffffffffffffffffffffff"))).catch((err) => {
+        console.error(err);
+      });
+    }
     await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 });
     // updateYourCollectibles();
   };
