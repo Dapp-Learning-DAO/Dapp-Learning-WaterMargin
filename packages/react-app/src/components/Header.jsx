@@ -3,14 +3,18 @@ import { PageHeader } from "antd";
 
 // displays a page header
 
-export default function Header() {
+export default function Header(props) {
   return (
-    <a href="https://watermargin.dapp-learning.com" target="_blank" rel="noopener noreferrer">
-      <PageHeader
-        title="⛵️ WaterMargin"
-        subTitle="🚀 by Dapp-Learning DAO"
-        style={{ cursor: "pointer" }}
-      />
-    </a>
+    <div>
+      <a href="https://dapp-learning.com" target="_blank" rel="noopener noreferrer">
+        <PageHeader
+          className="PageHeader"
+          title="⛵️ WaterMargin"
+          subTitle="🚀 by Dapp-Learning DAO"
+          style={{ cursor: "pointer" }}
+        />
+      </a>
+      {props.children}
+    </div>
   );
 }
