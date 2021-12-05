@@ -5,10 +5,10 @@ import { PageHeader } from "antd";
 
 export default function Header() {
   return (
-    <a href="https://github.com/austintgriffith/scaffold-eth" target="_blank" rel="noopener noreferrer">
+    <a href="https://watermargin.dapp-learning.com" target="_blank" rel="noopener noreferrer">
       <PageHeader
-        title="🏗 scaffold-eth"
-        subTitle="👩‍🔬 Buyer pays to mint NFT example"
+        title="⛵️ WaterMargin"
+        subTitle="🚀 by Dapp-Learning DAO"
         style={{ cursor: "pointer" }}
       />
     </a>
