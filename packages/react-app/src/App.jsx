@@ -295,6 +295,8 @@ function App(props) {
   const [yourBid, setYourBid] = useState({});
   const [galleryList, setGalleryList] = useState([]);
   const [timer, setTimer] = useState();
+  const [id_rank, setId_rank] = useState();
+
   const { loading, error, data } = useQuery(dappLearningCollectibles, {
     pollInterval: 500,
   });
@@ -309,6 +311,13 @@ function App(props) {
   const [loadedAssets, setLoadedAssets] = useState();
 
   useEffect(() => {
+    setId_rank(JSON.parse(localStorage.getItem("id_rank")) || {});
+    return () => {
+      localStorage.setItem("id_rank", JSON.stringify(id_rank));
+    };
+  }, []);
+
+  useEffect(() => {
     if (data) {
       clearInterval(timer);
       setTimer(
@@ -318,11 +327,6 @@ function App(props) {
       );
     }
   }, [data, readContracts]);
-
-  // if (currentColl?.data) {
-  //   console.log("currentColl data=====", currentColl?.data);
-  //   // setYourCollectibles(currentColl?.data?.dappLearningCollectibles);
-  // }
 
   // console.log(utils.id(Object.keys(assets)[0]));
   // useEffect(() => {
@@ -367,15 +371,32 @@ function App(props) {
     try {
       // let forSaleArr = await Promise.all(assetKeys.map(a => readContracts.YourCollectible.forSale(utils.id(a))));
       let forSaleArr = data?.dappLearningCollectibles?.map(a => a.isAuction);
+      let wait_arr = [];
+      let res = await Promise.all(
+        data?.dappLearningCollectibles
+          ?.filter(e => !Object.keys(id_rank).includes(e.tokenId))
+          .map(e => {
+            wait_arr.push(e.tokenId);
+            return readContracts.DappLearningCollectible.tokenURI(e.tokenId);
+          }),
+      );
+      let new_obj = { ...id_rank };
+      wait_arr.map((e, idx) => (new_obj[e] = res[idx]));
+      wait_arr.length > 0 && setId_rank({ ...new_obj });
+      let ranked_res = data?.dappLearningCollectibles?.map((e, i) => ({
+        ...e,
+        rank: new_obj[e.tokenId],
+      }));
+      // console.log(res);
       assetUpdate = await Promise.all(
-        data?.dappLearningCollectibles?.map((e, idx) => {
+        ranked_res.map((e, idx) => {
           const forSale = forSaleArr[idx];
-          if (!forSale) return Promise.resolve({ id: assetKeys[idx], ...assets[assetKeys[idx]], forSale, ...e });
+          if (!forSale) return Promise.resolve({ id: assetKeys[idx], ...assets[assetKeys[e.rank]], forSale, ...e });
           return new Promise((res, rej) => {
-            const { tokenId, owner } = data?.dappLearningCollectibles?.[idx];
+            const { tokenId, owner } = ranked_res[idx];
             const nftAddress = readContracts.DappLearningCollectible.address;
             readContracts.AuctionFixedPrice.getTokenAuctionDetails(nftAddress, tokenId).then(auctionInfo => {
-              res({ id: assetKeys[idx], ...assets[assetKeys[idx]], forSale, owner, auctionInfo, ...e });
+              res({ id: assetKeys[idx], ...assets[assetKeys[e.rank]], forSale, owner, auctionInfo, ...e });
             });
           });
         }),
