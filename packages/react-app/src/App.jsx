@@ -185,8 +185,6 @@ function App(props) {
   if (DEBUG) console.log("🤗 balance:", balance);
 
   const isInclaimList = useContractReader(readContracts, "DappLearningCollectible", "claimedBitMap", [address]);
-  console.log("isInclaimList",isInclaimList);
-  console.log("address=====",address)
 
   if (DEBUG) console.log("isInclaimList", isInclaimList);
 
