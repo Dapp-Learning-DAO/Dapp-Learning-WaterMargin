@@ -100,23 +100,22 @@ yarn replace
     graph deploy --studio DappLearningCollectible
     ```
 
+- 获取 graph URL  
+graph 部署成功后, 可以得到如下的信息.  
+```shell
+Subgraph endpoints:
+Queries (HTTP):     https://api.studio.thegraph.com/query/1542/dapp-learning-test/v0.1.0
+Subscriptions (WS): https://api.studio.thegraph.com/query/1542/dapp-learning-test/v0.1.0
+```
+
 - 复制环境变量文件  
 ```shell
 cd react/src
 cp .env.example .env
 
-## 然后在其中配置 REACT_APP_PROVIDER 和 REACT_APP_GRAPHQL 
+## 然后在其中配置 REACT_APP_PROVIDER 和 REACT_APP_GRAPHQL, 其中 REACT_APP_GRAPHQL 值为上一步 graph 部署成功后显示的值
 REACT_APP_PROVIDER
 REACT_APP_GRAPHQL
-```
-
-- 配置 react 环境变量  
-graph 部署成功后, 可以得到如下的信息.  
-使用其中的 Queries 信息替换 
-```shell
-Subgraph endpoints:
-Queries (HTTP):     https://api.studio.thegraph.com/query/1542/dapp-learning-test/v0.1.0
-Subscriptions (WS): https://api.studio.thegraph.com/query/1542/dapp-learning-test/v0.1.0
 ```
 
 - 启动 react   
