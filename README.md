@@ -110,7 +110,7 @@ Subscriptions (WS): https://api.studio.thegraph.com/query/1542/dapp-learning-tes
 
 - 复制环境变量文件  
 ```shell
-cd react/src
+cd react
 cp .env.example .env
 
 ## 然后在其中配置 REACT_APP_PROVIDER 和 REACT_APP_GRAPHQL, 其中 REACT_APP_GRAPHQL 值为上一步 graph 部署成功后显示的值
