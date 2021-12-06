@@ -582,8 +582,8 @@ function App(props) {
     const nftAddress = readContracts.DappLearningCollectible.address;
     const auctionAddress = readContracts.AuctionFixedPrice.address;
     const allowance = await readContracts.WETH.allowance(address, auctionAddress);
-    if (allowance < price) {
-      await tx(writeContracts.WETH.approve(auctionAddress, BigNumber.from("0xffffffffffffffffffffffffffffffff"))).catch((err) => {
+    if (allowance.lt(price)) {
+      await tx(writeContracts.WETH.approve(auctionAddress, BigNumber.MAX_SAFE_INTEGER)).catch((err) => {
         console.error(err);
       });
     }
