@@ -61,10 +61,10 @@ contract DappLearningCollectible is ERC721URIStorage{
     }
 
     require(RANKCOUNTER <= 108, 'Distribution is over');
+    
     if(MERKLEVALIDITY){
       require(MerkleProof.verify(proof, root, _leaf(msg.sender)), 'MerkleDistributor: Invalid proof.');
     }
-    require(RANKCOUNTER <= 108, 'Distribution is over');
 
     _tokenIds.increment();
 

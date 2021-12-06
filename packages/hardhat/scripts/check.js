@@ -22,14 +22,10 @@ async function main() {
 
   const artifactCollectible = artifacts.readArtifactSync("DappLearningCollectible");
 
-  let dappCollectible = new ethers.Contract( "0x1ee4a4a61025831ffd741cdd1Ac5542b30FAa62E" , artifactCollectible.abi , deployer );
+  let dappCollectible = new ethers.Contract( "0xD30f06BF5b4C26D6060ce6309E728A01a2165532" , artifactCollectible.abi , deployer );
 
-  let merkleTree = new MerkleTree(addressList.map(token => hashToken(token)), keccak256, { sortPairs: true });
-
-  let proof = merkleTree.getHexProof(hashToken(deployer.address));
-
-  let tx = await dappCollectible.mintItem(8,proof);
-  await tx.wait();
+  let bitmap = await dappCollectible.claimedBitMap("0xD95Be34213b53e3eC51091a0c5De07641Fc1728e");
+  console.log("bitmap=====",bitmap)
 
 }
 

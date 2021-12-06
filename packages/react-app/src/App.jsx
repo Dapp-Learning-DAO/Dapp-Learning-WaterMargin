@@ -185,6 +185,8 @@ function App(props) {
   if (DEBUG) console.log("🤗 balance:", balance);
 
   const isInclaimList = useContractReader(readContracts, "DappLearningCollectible", "claimedBitMap", [address]);
+  console.log("isInclaimList",isInclaimList);
+  console.log("address=====",address)
 
   if (DEBUG) console.log("isInclaimList", isInclaimList);
 
@@ -756,6 +758,7 @@ function App(props) {
               </StackGrid>
             </div>
           </Route>
+
 
           <Route path="/yourcollectibles">
             <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
