@@ -31,19 +31,6 @@ const main = async () => {
 
   // deploy the contract with all the artworks forSale
   const yourCollectible = await deploy("DappLearningCollectible",[]) // <-- add in constructor args like line 19 vvvv
-
-
-  /* Replace WETH address with correct one
-  *  rinkeyb: 0xc778417e063141139fce010982780140aa0cd5ab
-  *  Matic: 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619
-  */
-  replace({
-    regex: "0x46Dd6319e1CA8e889A13319CA0978B23A33CEd0E",
-    replacement: "0xc778417e063141139fce010982780140aa0cd5ab",
-    paths: [__dirname + '/../../react-app/src/contracts/WETH.address.js'],
-    recursive: true,
-    silent: true,
-  });
   
   // set MerkleRoot
   let merkleTree = new MerkleTree(addressList.map(token => hashToken(token)), keccak256, { sortPairs: true });

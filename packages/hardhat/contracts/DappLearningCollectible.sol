@@ -29,6 +29,9 @@ contract DappLearningCollectible is ERC721URIStorage{
 
   uint256 public RANKCOUNTER;
 
+  bool private MERKLEVALIDITY = true;
+
+  bool private MINTLIMITED = true;
   constructor() public ERC721("Dapp-Learning", "DLDAO") {
     ADMIN = msg.sender;
   }
@@ -43,11 +46,25 @@ contract DappLearningCollectible is ERC721URIStorage{
     root = _merkleroot;
   }
 
+  function setMerkleValidaity(bool _validity ) public onlyAdmin {
+    MERKLEVALIDITY = _validity;
+  }
+
+  function setMintLimited(bool _limited ) public onlyAdmin {
+    MINTLIMITED = _limited;
+  }
+
   function mintItem(uint seed, bytes32[] memory proof) public returns (uint256)
   {
-    require(!claimedBitMap[msg.sender], 'Already Minted');
+    if(MINTLIMITED){
+      require(!claimedBitMap[msg.sender], 'Already Minted');
+    }
+
     require(RANKCOUNTER <= 108, 'Distribution is over');
-    require(MerkleProof.verify(proof, root, _leaf(msg.sender)), 'MerkleDistributor: Invalid proof.');
+    if(MERKLEVALIDITY){
+      require(MerkleProof.verify(proof, root, _leaf(msg.sender)), 'MerkleDistributor: Invalid proof.');
+    }
+    require(RANKCOUNTER <= 108, 'Distribution is over');
 
     _tokenIds.increment();
 

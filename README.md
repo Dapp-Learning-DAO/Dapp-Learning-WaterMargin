@@ -8,13 +8,7 @@ cd Dapp-Learning-WaterMargin
 yarn
 ```
 
-- 上传图片到 IPFS 
-```shell
-cd Dapp-Learning-WaterMargin
-yarn upload
-```
-
-- 配置私钥  
+- 配置环境变量  
 ```shell
 cd packages/hardhat
 cp .env.example .env
@@ -23,11 +17,23 @@ cp .env.example .env
 PRIVATE_KEY=xxxxxxxxxxxxxxxx
 PROJECT_ID=yyyy
 PROJECT_SECRET=ZZZZ
+
+
+## rinkeby WETH : 0xc778417e063141139fce010982780140aa0cd5ab
+## Matic: 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619
+## 设置 WETH 地址，用于拍卖使用, 默认是配置为 rinkeby 的 WETH 地址，当合约部署到其他网络的时候，需要对应的修改这个值
+WETH_ADDRESS=0xc778417e063141139fce010982780140aa0cd5ab
+```
+
+- 上传图片到 IPFS 
+```shell
+cd Dapp-Learning-WaterMargin
+yarn upload
 ```
 
 - 设置 MerkleList  
 因为 DappLearningCollectible 使用了 Merkle 空投方式, 在部署前需要设置空投的地址, 以便后续进行测试使用.
-修改 packages/hardhat/scripts/addressList.json 文件, 在其中设置需要空投的地址 ( 即测试地址 )
+修改 packages/hardhat/scripts/addressList.json 文件, 在其中设置需要空投的地址
 
 - 部署合约  
 目前主合约为 DappLearningCollectible, 拍卖合约使用 AuctionFixedPrice.  
@@ -35,6 +41,14 @@ PROJECT_SECRET=ZZZZ
 ```shell
 cd Dapp-Learning-WaterMargin
 yarn deploy 
+```
+
+- 替换 WETH 地址和 addressList.json
+当前竞拍的所使用的标的资产是 ERC20, 为了方便, 同时能适配其他的网络, 需要进行 WETH 地址的替换.  
+执行如下 replace 命令, 即可替换 react-app/src/contracts/WETH.address.js 中 WETH  的地址, 以及 react-app/src/utils/addressList.json 文件
+```shell
+cd Dapp-Learning-WaterMargin
+yarn replace 
 ```
 
 - 部署 subgraph  

@@ -1,14 +1,8 @@
 /* eslint no-use-before-define: "warn" */
 const fs = require("fs");
-const chalk = require("chalk");
-const { config, ethers, tenderly, run } = require("hardhat");
-const { utils } = require("ethers");
 const R = require("ramda");
-const { MerkleTree } = require('merkletreejs');
-const keccak256 = require('keccak256');
-const addressList = require('./addressList.json');
-var replace = require("replace");
-
+require('dotenv').config();
+var childprocess = require('child_process');
 
 const main = async () => {
 
@@ -16,14 +10,12 @@ const main = async () => {
   *  rinkeyb: 0xc778417e063141139fce010982780140aa0cd5ab
   *  Matic: 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619
   */
-  replace({
-    regex: "0x46Dd6319e1CA8e889A13319CA0978B23A33CEd0E",
-    replacement: "0xc778417e063141139fce010982780140aa0cd5ab",
-    paths: [__dirname + '/../../react-app/src/contracts/WETH.address.js'],
-    recursive: true,
-    silent: true,
-  });
+  let WETHAddress = 'module.exports = "' + process.env.WETH_ADDRESS + '";';
+  fs.writeFileSync(__dirname + '/../../react-app/src/contracts/WETH.address.js', WETHAddress);
   
+  // Replace addressList.json'
+  var addressList = fs.readFileSync(__dirname + '/addressList.json');
+  fs.writeFileSync(__dirname + '/../../react-app/src/utils/addressList.json', addressList);
 
 };
 

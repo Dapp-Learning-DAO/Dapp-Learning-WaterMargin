@@ -338,6 +338,32 @@ module.exports = [
   {
     "inputs": [
       {
+        "internalType": "bool",
+        "name": "_validity",
+        "type": "bool"
+      }
+    ],
+    "name": "setMerkleValidaity",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_limited",
+        "type": "bool"
+      }
+    ],
+    "name": "setMintLimited",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "_merkleroot",
         "type": "bytes32"
