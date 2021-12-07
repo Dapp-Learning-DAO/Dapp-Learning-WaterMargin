@@ -31,6 +31,8 @@ import { useThemeSwitcher } from "react-css-theme-switcher";
 
 const { Text } = Typography;
 
+export const ellipseAddress = ( address = "", width = 8 ) => `${address.slice(0, width)}...${address.slice(-width)}`;
+
 const blockExplorerLink = (address, blockExplorer) => `${blockExplorer || "https://etherscan.io/"}${"address/"}${address}`;
 
 export default function Address(props) {
@@ -54,7 +56,7 @@ export default function Address(props) {
   if (ens && ens.indexOf("0x")<0) {
     displayAddress = ens;
   } else if (props.size === "short") {
-    displayAddress += "..." + address.substr(-4);
+    displayAddress = ellipseAddress(address, 6);
   } else if (props.size === "long") {
     displayAddress = address;
   }
@@ -89,10 +91,10 @@ export default function Address(props) {
 
   return (
     <span>
-      <span style={{ verticalAlign: "middle" }}>
+      { !props.disableBlockies && <span style={{ verticalAlign: "middle" }}>
         <Blockies seed={address.toLowerCase()} size={8} scale={props.fontSize?props.fontSize/7:4} />
-      </span>
-      <span style={{ verticalAlign: "middle", paddingLeft: 5, fontSize: props.fontSize?props.fontSize:28 }}>{text}</span>
+      </span> }
+      <span style={{ verticalAlign: "middle", paddingLeft: 5, fontSize: props.fontSize ? props.fontSize : 28 }}>{text}</span>
     </span>
   );
 }
