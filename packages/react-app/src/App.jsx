@@ -4,7 +4,7 @@ import "antd/dist/antd.css";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
 import "./App.css";
-import { Row, Col, Button, Menu, Alert, List, Card, Modal, InputNumber } from "antd";
+import { Row, Col, Button, Menu, Alert, List, Card, Modal, InputNumber, Empty } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
@@ -34,6 +34,9 @@ import { FireOutlined } from "@ant-design/icons";
 import { useQuery } from "@apollo/client";
 import getProof from "./utils/getMerkleTree";
 import { dappLearningCollectibles, getCurrentColl } from "./gql";
+import { Loading, useLoading } from "./components/Loading"
+import { NFTImage } from "./components/Image"
+import { NoData } from "./components/NoData"
 
 const { BufferList } = require("bl");
 // https://www.npmjs.com/package/ipfs-http-client
@@ -289,6 +292,7 @@ function App(props) {
   const [sending, setSending] = useState();
   const [ipfsHash, setIpfsHash] = useState();
   const [ipfsDownHash, setIpfsDownHash] = useState();
+  const { openLoading, closeLoading, loading: load } = useLoading()
 
   const [downloading, setDownloading] = useState();
   const [ipfsContent, setIpfsContent] = useState();
@@ -312,7 +316,12 @@ function App(props) {
   const [loadedAssets, setLoadedAssets] = useState();
 
   useEffect(() => {
-    setId_rank(JSON.parse(localStorage.getItem("id_rank")) || {});
+    try {
+      // Fix an issue where an error in the following code causes the page to crash
+      setId_rank(JSON.parse(localStorage.getItem("id_rank")) || {});
+    } catch (error) {
+      console.log(error)
+    }
     return () => {
       localStorage.setItem("id_rank", JSON.stringify(id_rank));
     };
@@ -413,6 +422,7 @@ function App(props) {
   // let galleryList = [];
 
   useEffect(() => {
+    openLoading()
     if (!address || !loadedAssets) return;
     let list = [];
     setGalleryList(null);
@@ -485,8 +495,8 @@ function App(props) {
         isAuction ? (
           <div style={{ marginTop: "4px", textAlign: 'left' }} key={id}>
             <div style={{ fontWeight: "bold", display: 'flex', padding: '0 8px' }}>
-              <span style={{flex: 1}}>{!isEnded ? `in progress` : "ended"}</span>
-              <span>price: <span style={{color: 'rgb(24, 144, 255)', fontSize: '16px'}}>{utils.formatEther(price)}</span> WETH</span>
+              <span style={{ flex: 1 }}>{!isEnded ? `in progress` : "ended"}</span>
+              <span>price: <span style={{ color: 'rgb(24, 144, 255)', fontSize: '16px' }}>{utils.formatEther(price)}</span> WETH</span>
             </div>
             <div style={{ marginBottom: 4 }}>{!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : ""}</div>
             {/* <div>
@@ -530,24 +540,17 @@ function App(props) {
 
       list.push(
         <div key={name} className={"cardBox"}>
-          <div className={"imgBox"}>
-            <div style={{ height: "100%" }}>
-              <img src={image} />
-            </div>
-          </div>
-          <div className={"infoBox"}>
-            {owner && (
-              <div className="avatar">
-                <Address address={owner} ensProvider={mainnetProvider} blockExplorer={blockExplorer} minimized={true} />
-              </div>
-            )}
-            <div style={{ opacity: 0.77, fontSize: '16px', fontWeight: 'bold' }}>{description}</div>
+          <NFTImage image={image} />
+          <div style={{ opacity: 0.77, padding: "16px 10px 5px", fontSize: '16px', fontWeight: 'bold', display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            {description}
+            {owner && <Address address={owner} size="short" disableBlockies ensProvider={mainnetProvider} blockExplorer={blockExplorer} minimized={false} fontSize={16}/>}
           </div>
           {auctionDetails}
           <div>{cardActions}</div>
         </div>,
       );
     }
+    closeLoading()
     setGalleryList([...list]);
   }, [loadedAssets, address]);
 
@@ -751,12 +754,11 @@ function App(props) {
                 Update collectibles
               </Button> */}
 
-              <StackGrid columnWidth={416} gutterWidth={16} gutterHeight={32}>
+              { galleryList?.length ? <StackGrid columnWidth={416} gutterWidth={16} gutterHeight={32}>
                 {galleryList}
-              </StackGrid>
+              </StackGrid> : ( !load ? <NoData style={{ marginTop: 50 }}/> : null )}
             </div>
           </Route>
-
 
           <Route path="/yourcollectibles">
             <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
@@ -953,6 +955,7 @@ function App(props) {
           </Col>
         </Row>
       </div>
+      <Loading />
     </div>
   );
 }
