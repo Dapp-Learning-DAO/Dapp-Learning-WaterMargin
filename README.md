@@ -100,8 +100,32 @@ yarn replace
     graph deploy --studio DappLearningCollectible
     ```
 
+- 获取 graph URL  
+graph 部署成功后, 可以得到如下的信息.  
+```shell
+Subgraph endpoints:
+Queries (HTTP):     https://api.studio.thegraph.com/query/1542/dapp-learning-test/v0.1.0
+Subscriptions (WS): https://api.studio.thegraph.com/query/1542/dapp-learning-test/v0.1.0
+```
+
+- 复制环境变量文件  
+```shell
+cd react
+cp .env.example .env
+
+## 然后在其中配置 REACT_APP_PROVIDER 和 REACT_APP_GRAPHQL, 其中 REACT_APP_GRAPHQL 值为上一步 graph 部署成功后显示的值
+REACT_APP_PROVIDER
+REACT_APP_GRAPHQL
+```
+
+- 启动 react   
+```
+yarn start
+```
+
 - Mint NFT 
-只有在 packages/hardhat/scripts/addressList.json 文件中的账户地址才能进行 Mint 操作 
+只有在 packages/hardhat/scripts/addressList.json 文件中的账户地址才能进行 Mint 操作.
+
 
 - 拍卖  
 查看 Auction 合约中的 createTokenAuction 方法, 即拍卖方法, 可以发现其中调用了 IERC721(_nft).safeTransferFrom(owner, address(this), _tokenId), 即用户在执行拍卖前需要对 Auction 合约进行  NFT 的 approve 授权
