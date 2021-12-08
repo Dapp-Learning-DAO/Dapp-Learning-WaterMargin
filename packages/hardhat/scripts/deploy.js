@@ -36,7 +36,11 @@ const main = async () => {
   let merkleTree = new MerkleTree(addressList.map(token => hashToken(token)), keccak256, { sortPairs: true });
   await yourCollectible.setRoot(merkleTree.getHexRoot());
 
-  const auction = await deploy("AuctionFixedPrice",[]) // <-- add in constructor args like line 19 vvvv
+  // Deploy contract AuctionFixedPrice
+  const auctionFixed = await deploy("AuctionFixedPrice",[]) // <-- add in constructor args like line 19 vvvv
+
+  // Deploy contract AuctionUnfixedPrice
+  const auctionUnfixed = await deploy("AuctionUnfixedPrice",[]) // <-- add in constructor args like line 19 vvvv
 
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
