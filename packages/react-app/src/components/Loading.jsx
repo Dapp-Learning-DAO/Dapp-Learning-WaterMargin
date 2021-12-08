@@ -72,7 +72,7 @@ export const Loading = () => {
           <div className="object" id="object_two"></div>
           <div className="object" id="object_one"></div>
         </div>
-        {show && <div id="close-loading" onClick={closeLoading}><CloseCircleOutlined /></div>}
+        {/* {show && <div id="close-loading" onClick={closeLoading}><CloseCircleOutlined /></div>} */}
         {/* {show && <div id="close-text" >Chaining speed is slow, please be patient.</div>} */}
       </div>
     </div>

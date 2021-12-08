@@ -34,9 +34,9 @@ import { FireOutlined } from "@ant-design/icons";
 import { useQuery } from "@apollo/client";
 import getProof from "./utils/getMerkleTree";
 import { dappLearningCollectibles, getCurrentColl } from "./gql";
-import { Loading, useLoading } from "./components/Loading"
-import { NFTImage } from "./components/Image"
-import { NoData } from "./components/NoData"
+import { Loading, useLoading } from "./components/Loading";
+import { NFTImage } from "./components/Image";
+import { NoData } from "./components/NoData";
 
 const { BufferList } = require("bl");
 // https://www.npmjs.com/package/ipfs-http-client
@@ -187,9 +187,18 @@ function App(props) {
   const balance = useContractReader(readContracts, "DappLearningCollectible", "balanceOf", [address]);
   if (DEBUG) console.log("🤗 balance:", balance);
 
+  const auctionAddress = readContracts?.AuctionFixedPrice?.address;
+
   const isInclaimList = useContractReader(readContracts, "DappLearningCollectible", "claimedBitMap", [address]);
 
   if (DEBUG) console.log("isInclaimList", isInclaimList);
+
+  const isApproved = useContractReader(readContracts, "DappLearningCollectible", "isApprovedForAll", [
+    address,
+    auctionAddress,
+  ]);
+
+  if (DEBUG) console.log("isApproved", isApproved);
 
   //📟 Listen for broadcast events
   const transferEvents = useEventListener(readContracts, "DappLearningCollectible", "Transfer", localProvider, 1);
@@ -292,7 +301,7 @@ function App(props) {
   const [sending, setSending] = useState();
   const [ipfsHash, setIpfsHash] = useState();
   const [ipfsDownHash, setIpfsDownHash] = useState();
-  const { openLoading, closeLoading, loading: load } = useLoading()
+  const { openLoading, closeLoading, loading: load } = useLoading();
 
   const [downloading, setDownloading] = useState();
   const [ipfsContent, setIpfsContent] = useState();
@@ -320,7 +329,7 @@ function App(props) {
       // Fix an issue where an error in the following code causes the page to crash
       setId_rank(JSON.parse(localStorage.getItem("id_rank")) || {});
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
     return () => {
       localStorage.setItem("id_rank", JSON.stringify(id_rank));
@@ -422,7 +431,7 @@ function App(props) {
   // let galleryList = [];
 
   useEffect(() => {
-    openLoading()
+    openLoading();
     if (!address || !loadedAssets) return;
     let list = [];
     setGalleryList(null);
@@ -456,11 +465,11 @@ function App(props) {
                   style={btnStyle}
                   block
                   type="primary"
-                  onClick={() => startAuction(id)}
+                  onClick={() => (!isApproved ? approveAll() : startAuction(id))}
                   disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
-                  Start auction
+                  {!isApproved ? "Approve this collectible" : "Start auction"}
                 </Button>
               </>
             )}
@@ -493,12 +502,17 @@ function App(props) {
 
       auctionDetails.push(
         isAuction ? (
-          <div style={{ marginTop: "4px", textAlign: 'left' }} key={id}>
-            <div style={{ fontWeight: "bold", display: 'flex', padding: '0 8px' }}>
+          <div style={{ marginTop: "4px", textAlign: "left" }} key={id}>
+            <div style={{ fontWeight: "bold", display: "flex", padding: "0 8px" }}>
               <span style={{ flex: 1 }}>{!isEnded ? `in progress` : "ended"}</span>
-              <span>price: <span style={{ color: 'rgb(24, 144, 255)', fontSize: '16px' }}>{utils.formatEther(price)}</span> WETH</span>
+              <span>
+                price: <span style={{ color: "rgb(24, 144, 255)", fontSize: "16px" }}>{utils.formatEther(price)}</span>{" "}
+                WETH
+              </span>
             </div>
-            <div style={{ marginBottom: 4 }}>{!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : ""}</div>
+            <div style={{ marginBottom: 4, padding: "0 8px" }}>
+              {!isEnded ? `Auction ends at ${format(deadline, "MMMM dd, hh:mm:ss")}` : ""}
+            </div>
             {/* <div>
               {maxBidUser === constants.AddressZero ? (
                 "Highest bid was not made yet"
@@ -535,22 +549,46 @@ function App(props) {
               </Button>
             </div> */}
           </div>
-        ) : null,
+        ) : (
+          <div style={{ minHeight: "50px", marginTop: "4px", padding: "0 8px", textAlign: "left" }}>
+            {!isApproved && "if you want start an auction, you should approve this collectible🙌"}
+          </div>
+        ),
       );
 
       list.push(
         <div key={name} className={"cardBox"}>
           <NFTImage image={image} />
-          <div style={{ opacity: 0.77, padding: "16px 10px 5px", fontSize: '16px', fontWeight: 'bold', display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div
+            style={{
+              opacity: 0.77,
+              padding: "16px 10px 5px",
+              fontSize: "16px",
+              fontWeight: "bold",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             {description}
-            {owner && <Address address={owner} size="short" disableBlockies ensProvider={mainnetProvider} blockExplorer={blockExplorer} minimized={false} fontSize={16}/>}
+            {owner && (
+              <Address
+                address={owner}
+                size="short"
+                disableBlockies
+                ensProvider={mainnetProvider}
+                blockExplorer={blockExplorer}
+                minimized={false}
+                fontSize={16}
+              />
+            )}
           </div>
           {auctionDetails}
           <div>{cardActions}</div>
         </div>,
       );
     }
-    closeLoading()
+    closeLoading();
     setGalleryList([...list]);
   }, [loadedAssets, address]);
 
@@ -570,13 +608,20 @@ function App(props) {
     // updateYourCollectibles();
   };
 
+  const approveAll = async () => {
+    try {
+      const auctionAddress = readContracts.AuctionFixedPrice.address;
+      await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true);
+    } catch (error) {}
+  };
+
   const completeAuction = async (tokenId, price) => {
     // const tokenId = await readContracts.YourCollectible.uriToTokenId(utils.id(tokenUri));
     // return console.log(price);
 
     // check balance
     const balance = await readContracts.WETH.balanceOf(address);
-    console.warn(balance.toString())
+    console.warn(balance.toString());
     if (balance < price) {
       // TODO: alert not enough money
       return;
@@ -586,7 +631,7 @@ function App(props) {
     const auctionAddress = readContracts.AuctionFixedPrice.address;
     const allowance = await readContracts.WETH.allowance(address, auctionAddress);
     if (allowance.lt(price)) {
-      await tx(writeContracts.WETH.approve(auctionAddress, BigNumber.MAX_SAFE_INTEGER)).catch((err) => {
+      await tx(writeContracts.WETH.approve(auctionAddress, BigNumber.MAX_SAFE_INTEGER)).catch(err => {
         console.error(err);
       });
     }
@@ -607,25 +652,37 @@ function App(props) {
     const auctionAddress = readContracts.AuctionFixedPrice.address;
     const nftAddress = readContracts.DappLearningCollectible.address;
     const WETH_Address = readContracts.WETH.address;
-    const isApproved = await readContracts.DappLearningCollectible.isApprovedForAll(address, auctionAddress);
-    if (!isApproved) {
-      await tx(writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true))
-        .catch((err) => {
-          console.error(err);
-        });
+
+    try {
+      // let res1 = await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, false);
+      // return console.log(res1);
+      const isApproved = await readContracts.DappLearningCollectible.isApprovedForAll(address, auctionAddress);
+      console.log(isApproved);
+      if (!isApproved) {
+        let res = await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true);
+        return console.log(res);
+      }
+
+      const ethPrice = utils.parseEther(price.toString());
+      const blockDuration = Math.floor(new Date().getTime() / 1000) + duration;
+
+      await tx(
+        writeContracts.AuctionFixedPrice.createTokenAuction(
+          nftAddress,
+          tokenId,
+          WETH_Address,
+          ethPrice,
+          blockDuration,
+          {
+            gasPrice,
+          },
+        ),
+      );
+      const auctionInfo = await readContracts.AuctionFixedPrice.getTokenAuctionDetails(nftAddress, tokenId);
+      console.log("auctionInfo", { auctionInfo });
+    } catch (err) {
+      console.error(err);
     }
-
-    const ethPrice = utils.parseEther(price.toString());
-    const blockDuration = Math.floor(new Date().getTime() / 1000) + duration;
-
-    await tx(
-      writeContracts.AuctionFixedPrice.createTokenAuction(nftAddress, tokenId, WETH_Address, ethPrice, blockDuration, {
-        gasPrice,
-      }),
-    );
-
-    const auctionInfo = await readContracts.AuctionFixedPrice.getTokenAuctionDetails(nftAddress, tokenId);
-    console.log("auctionInfo", { auctionInfo });
   };
 
   const handleCancel = () => {
@@ -745,7 +802,7 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
-            <div style={{ maxWidth: '1280', margin: "auto", marginTop: 32, paddingBottom: 108 }}>
+            <div style={{ maxWidth: "1280", margin: "auto", marginTop: 32, paddingBottom: 108 }}>
               {/* <Button
                 disabled={galleryList.length === 0}
                 onClick={updateYourCollectibles}
@@ -754,9 +811,13 @@ function App(props) {
                 Update collectibles
               </Button> */}
 
-              { galleryList?.length ? <StackGrid columnWidth={416} gutterWidth={16} gutterHeight={32}>
-                {galleryList}
-              </StackGrid> : ( !load ? <NoData style={{ marginTop: 50 }}/> : null )}
+              {galleryList?.length ? (
+                <StackGrid columnWidth={416} gutterWidth={16} gutterHeight={32}>
+                  {galleryList}
+                </StackGrid>
+              ) : !load ? (
+                <NoData style={{ marginTop: 50 }} />
+              ) : null}
             </div>
           </Route>
 
