@@ -53,8 +53,8 @@ export default function Address(props) {
 
   if (ens && ens.indexOf("0x")<0) {
     displayAddress = ens;
-  } else if (props.size === "short") {
-    displayAddress = ellipseAddress(address, 6);
+  } else if (Number(props.size) >= 2) {
+    displayAddress = ellipseAddress(address, props.size);
   } else if (props.size === "long") {
     displayAddress = address;
   }

@@ -570,7 +570,7 @@ function App(props) {
             {owner && (
               <Address
                 address={owner}
-                size="short"
+                size={6}
                 disableBlockies
                 ensProvider={mainnetProvider}
                 blockExplorer={blockExplorer}

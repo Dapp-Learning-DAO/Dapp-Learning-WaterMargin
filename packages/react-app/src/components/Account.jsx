@@ -62,7 +62,7 @@ export default function Account({
         disableBlockies
         ensProvider={mainnetProvider}
         blockExplorer={blockExplorer}
-        size="short"
+        size={10}
         minimized={false}
         fontSize={14} /></div> : "Connecting..."}
       <div style={{ marginTop: -5, display: "flex", justifyContent: "start" }}>
