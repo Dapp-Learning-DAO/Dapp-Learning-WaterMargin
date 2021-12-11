@@ -1,6 +1,8 @@
 {
   "name": "dapp-learning-test",
-  "license": "UNLICENSED",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
