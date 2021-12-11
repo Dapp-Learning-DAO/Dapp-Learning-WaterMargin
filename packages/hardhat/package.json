@@ -1,5 +1,5 @@
 {
-  "name": "@scaffold-eth/hardhat",
+  "name": "hardhat",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -36,8 +36,8 @@
     "test": "hardhat test --network hardhat",
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.js",
-    "replace": "hardhat run scripts/replace.js",
     "postdeploy": "hardhat run scripts/publish.js",
+    "replace": "hardhat run scripts/replace.js",
     "watch": "node scripts/watch.js",
     "accounts": "hardhat accounts",
     "balance": "hardhat balance",

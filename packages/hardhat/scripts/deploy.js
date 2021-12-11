@@ -1,13 +1,12 @@
 /* eslint no-use-before-define: "warn" */
 const fs = require("fs");
 const chalk = require("chalk");
-const { config, ethers, tenderly, run } = require("hardhat");
+const { config, ethers, tenderly, run,network } = require("hardhat");
 const { utils } = require("ethers");
 const R = require("ramda");
 const { MerkleTree } = require('merkletreejs');
 const keccak256 = require('keccak256');
 const addressList = require('./addressList.json');
-var replace = require("replace");
 
 function hashToken(account) {
   return Buffer.from(ethers.utils.solidityKeccak256(['address'], [account]).slice(2), 'hex')
@@ -15,7 +14,6 @@ function hashToken(account) {
 
 
 const main = async () => {
-
   console.log("\n\n 📡 Deploying...\n");
 
   // read in all the assets to get their IPFS hash...
@@ -35,6 +33,8 @@ const main = async () => {
   // set MerkleRoot
   let merkleTree = new MerkleTree(addressList.map(token => hashToken(token)), keccak256, { sortPairs: true });
   await yourCollectible.setRoot(merkleTree.getHexRoot());
+
+  console.log("Merkle Root=======",merkleTree.getHexRoot());
 
   // Deploy contract AuctionFixedPrice
   const auctionFixed = await deploy("AuctionFixedPrice",[]) // <-- add in constructor args like line 19 vvvv

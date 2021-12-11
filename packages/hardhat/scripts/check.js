@@ -22,10 +22,12 @@ async function main() {
 
   const artifactCollectible = artifacts.readArtifactSync("DappLearningCollectible");
 
-  let dappCollectible = new ethers.Contract( "0xD30f06BF5b4C26D6060ce6309E728A01a2165532" , artifactCollectible.abi , deployer );
+  let dappCollectible = new ethers.Contract( "0x10C31Ec7Ed18b0A5ab852E9E18B4A12E401986A6" , artifactCollectible.abi , deployer );
 
-  let bitmap = await dappCollectible.claimedBitMap("0xD95Be34213b53e3eC51091a0c5De07641Fc1728e");
-  console.log("bitmap=====",bitmap)
+  // 设置 Merkle tree
+  await dappCollectible.setMerkleValidaity(false);
+  //let bitmap = await dappCollectible.claimedBitMap("0xD95Be34213b53e3eC51091a0c5De07641Fc1728e");
+  //console.log("bitmap=====",bitmap)
 
 }
 
