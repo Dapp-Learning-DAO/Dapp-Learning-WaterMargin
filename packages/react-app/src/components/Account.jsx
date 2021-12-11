@@ -4,6 +4,7 @@ import Address from "./Address";
 import Balance from "./Balance";
 import Wallet from "./Wallet";
 import { useThemeSwitcher } from "react-css-theme-switcher";
+import { bgColor, textColor, activeColor } from "../theme"
 
 /*
   ~ What it does? ~
@@ -51,52 +52,48 @@ export default function Account({
   logoutOfWeb3Modal,
   blockExplorer,
 }) {
-  const modalButtons = [];
-  if (web3Modal) {
-    if (web3Modal.cachedProvider) {
-      modalButtons.push(
-        <Button
-          key="logoutbutton"
-          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
-          shape="round"
-          size="large"
-          onClick={logoutOfWeb3Modal}
-        >
-          logout
-        </Button>,
-      );
-    } else {
-      modalButtons.push(
-        <Button
-          key="loginbutton"
-          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
-          shape="round"
-          size="large"
-          /*type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time*/
-          onClick={loadWeb3Modal}
-        >
-          connect
-        </Button>,
-      );
-    }
-  }
-
-  const { currentTheme } = useThemeSwitcher();
 
   const display = minimized ? (
     ""
   ) : (
-    <span>
-      {address ? <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} /> : "Connecting..."}
-      <Balance address={address} provider={localProvider} price={price} />
-      <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} color={currentTheme == "light" ? "#1890ff" : "#2caad9"} />
-    </span>
+    <div style={{ background: "#FFFFFF", paddingLeft: 10, paddingRight: 10, borderRadius: 5, height: 40 }}>
+      {address ? <div><Address
+        address={address}
+        disableBlockies
+        ensProvider={mainnetProvider}
+        blockExplorer={blockExplorer}
+        size="short"
+        minimized={false}
+        fontSize={14} /></div> : "Connecting..."}
+      <div style={{ marginTop: -5, display: "flex", justifyContent: "start" }}>
+        <Balance address={address} provider={localProvider} price={price} size={14} />
+      </div>
+      {/* <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} color={currentTheme == "light" ? "#1890ff" : "#2caad9"} /> */}
+    </div>
   );
 
   return (
-    <div>
-      {display}
-      {modalButtons}
+    <div style={{ display: "flex", alignItems: "center" }}>
+      { web3Modal?.cachedProvider && display}
+      &nbsp;&nbsp;
+      { web3Modal && <span
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: 'center',
+          width: 100,
+          borderRadius: 5,
+          height: 40,
+          background: activeColor,
+          marginLeft: 8,
+          color: "#FFFFFF",
+          cursor: "pointer",
+          fontSize: 20
+        }}
+        onClick={web3Modal?.cachedProvider ? logoutOfWeb3Modal : loadWeb3Modal}
+      >
+        {web3Modal.cachedProvider ? "logout" : "connect"}
+      </span>}
     </div>
   );
 }

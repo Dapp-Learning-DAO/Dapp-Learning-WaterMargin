@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { formatEther } from "@ethersproject/units";
 import { usePoller } from "eth-hooks";
 import { useBalance } from "../hooks"
+import { activeColor } from "../theme";
 
 /*
   ~ What it does? ~
@@ -67,8 +68,9 @@ export default function Balance(props) {
       style={{
         verticalAlign: "middle",
         fontSize: props.size ? props.size : 24,
-        padding: 8,
         cursor: "pointer",
+        color: activeColor,
+        fontStyle: "italic"
       }}
       onClick={() => {
         setDollarMode(!dollarMode);

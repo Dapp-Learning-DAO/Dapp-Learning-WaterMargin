@@ -124,9 +124,9 @@
   -webkit-border-radius: 50% 50% 50% 50%;
   border-radius: 50% 50% 50% 50%;
   position: absolute;
-  border-top: 5px solid #1890ff;
+  border-top: 5px solid rgba(208, 28, 21, 1);
   border-bottom: 5px solid transparent;
-  border-left:  5px solid #1890ff;
+  border-left:  5px solid rgba(208, 28, 21, 1);
   border-right: 5px solid transparent;
   -webkit-animation: animate 2s infinite;
   animation: animate 2s infinite;	
@@ -191,7 +191,7 @@
   position: absolute;
   left: 60%;
   top: 30%;
-  color: #1890ff;
+  color: rgba(208, 28, 21, 1);
   font-size: 30px;
   cursor: pointer;
   z-index: 10000;
@@ -203,7 +203,7 @@
   margin-left: -150px;
   bottom: 50%;
   margin-bottom: -150px;
-  color: #1890ff;
+  color: rgba(208, 28, 21, 1);
   font-size: 20px;
   cursor: pointer;
   z-index: 10000;
