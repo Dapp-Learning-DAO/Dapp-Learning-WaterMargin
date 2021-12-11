@@ -80,24 +80,21 @@ async function main() {
     fs.mkdirSync(publishDir);
   }
   const finalContractList = [];
-  console.log("Sounrce of file========", bre.config.paths.sources);
   fs.readdirSync(bre.config.paths.sources).forEach((file) => {
-    console.log("File name======", file);
     if (file.indexOf(".sol") >= 0) {
       const contractName = file.replace(".sol", "");
-      console.log("After replace ======", contractName);
       // Add contract to list if publishing is successful
       publishContract(contractName)
       finalContractList.push(contractName);
-      // if (publishContract(contractName)) {
-      //   finalContractList.push(contractName);
-      // }
+      if (publishContract(contractName)) {
+         finalContractList.push(contractName);
+       }
     }
   });
-  fs.writeFileSync(
+  /* fs.writeFileSync(
     `${publishDir}/contracts.js`,
     `module.exports = ${JSON.stringify(finalContractList)};`
-  );
+  ); */
 }
 main()
   .then(() => process.exit(0))
