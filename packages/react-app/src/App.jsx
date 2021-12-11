@@ -189,6 +189,10 @@ function App(props) {
 
   const auctionAddress = readContracts?.AuctionFixedPrice?.address;
 
+  const weth_balance = useContractReader(readContracts, "WETH", "allowance", [address, auctionAddress]);
+  // console.log("weth_balance", weth_balance);
+  if (DEBUG) console.log("🤗 balance:", balance);
+
   const isInclaimList = useContractReader(readContracts, "DappLearningCollectible", "claimedBitMap", [address]);
 
   if (DEBUG) console.log("isInclaimList", isInclaimList);
@@ -459,6 +463,20 @@ function App(props) {
       cardActions.push(
         <div className="cardAction" key={id}>
           <div className="actionBox">
+            {isAuction && weth_balance < price && (
+              <>
+                <Button
+                  style={btnStyle}
+                  block
+                  type="primary"
+                  onClick={() => approveWETH()}
+                  // disabled={address * 1 !== owner * 1}
+                >
+                  <FlagOutlined />
+                  Approve my WETH
+                </Button>
+              </>
+            )}
             {!isAuction && address * 1 === owner * 1 && (
               <>
                 <Button
@@ -474,7 +492,7 @@ function App(props) {
               </>
             )}
             {/* isActive && address === seller */}
-            {isAuction && !isEnded && (
+            {isAuction && !isEnded && weth_balance >= price && (
               <Button style={btnStyle} block ghost type="primary" onClick={() => completeAuction(id, price)}>
                 I want this
               </Button>
@@ -615,26 +633,30 @@ function App(props) {
     } catch (error) {}
   };
 
+  const approveWETH = async () => {
+    try {
+      const auctionAddress = readContracts.AuctionFixedPrice.address;
+      await tx(writeContracts.WETH.approve(auctionAddress, BigNumber.from("0xffffffffffffffffffffffffffffffff")));
+      // const auctionAddress = readContracts.AuctionFixedPrice.address;
+      // const allowance = await readContracts.WETH.allowance(address, auctionAddress);
+      // if (allowance.lt(price)) {
+
+      // }
+    } catch (err) {}
+  };
+
   const completeAuction = async (tokenId, price) => {
     // const tokenId = await readContracts.YourCollectible.uriToTokenId(utils.id(tokenUri));
     // return console.log(price);
 
     // check balance
-    const balance = await readContracts.WETH.balanceOf(address);
-    console.warn(balance.toString());
-    if (balance < price) {
-      // TODO: alert not enough money
-      return;
-    }
-
+    // const balance = await readContracts.WETH.balanceOf(address);
+    // console.warn(balance.toString());
+    // if (balance < price) {
+    //   // TODO: alert not enough money
+    //   return;
+    // }
     const nftAddress = readContracts.DappLearningCollectible.address;
-    const auctionAddress = readContracts.AuctionFixedPrice.address;
-    const allowance = await readContracts.WETH.allowance(address, auctionAddress);
-    if (allowance.lt(price)) {
-      await tx(writeContracts.WETH.approve(auctionAddress, BigNumber.MAX_SAFE_INTEGER)).catch(err => {
-        console.error(err);
-      });
-    }
     await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 });
     // updateYourCollectibles();
   };
