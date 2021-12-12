@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
-import "./App.css";
 import "antd/dist/antd.css";
+import "./App.css";
 import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty, message } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
@@ -112,8 +112,7 @@ if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
 // attempt to connect to our own scaffold eth rpc and if that fails fall back to infura...
-const scaffoldEthProvider = new JsonRpcProvider("https://rpc.scaffoldeth.io:48544");
-const mainnetInfura = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID);
+const mainnetInfura = new JsonRpcProvider("https://rinkeby.infura.io/v3/" + INFURA_ID);
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I
 
 // 🏠 Your local provider is usually pointed at your local blockchain
@@ -127,12 +126,12 @@ const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 const blockExplorer = targetNetwork?.blockExplorer;
 
 function App(props) {
-  const mainnetProvider = scaffoldEthProvider && scaffoldEthProvider._network ? scaffoldEthProvider : mainnetInfura;
+  const mainnetProvider = mainnetInfura;
   if (DEBUG) console.log("🌎 mainnetProvider", mainnetProvider);
 
   const [injectedProvider, setInjectedProvider] = useState();
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangePrice(targetNetwork, mainnetProvider);
+  // const price = useExchangePrice(targetNetwork, mainnetProvider);
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork, "fast");
@@ -177,22 +176,16 @@ function App(props) {
   // If you want to bring in the mainnet DAI contract it would look like:
   const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI);
   if (DEBUG) console.log("🌍 DAI contract on mainnet:", mainnetDAIContract);
-  //
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader({ DAI: mainnetDAIContract }, "DAI", "balanceOf", [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-  ]);
-  if (DEBUG) console.log("🥇 myMainnetDAIBalance:", myMainnetDAIBalance);
+
 
   // keep track of a variable from the contract in the local React state:
-  const balance = useContractReader(readContracts, "DappLearningCollectible", "balanceOf", [address]);
-  if (DEBUG) console.log("🤗 balance:", balance);
+  // const balance = useContractReader(readContracts, "DappLearningCollectible", "balanceOf", [address]);
+  // if (DEBUG) console.log("🤗 balance:", balance);
 
   const auctionAddress = readContracts?.AuctionFixedPrice?.address;
 
   const weth_balance = useContractReader(readContracts, "WETH", "allowance", [address, auctionAddress]);
-  // console.log("weth_balance", weth_balance);
-  if (DEBUG) console.log("🤗 balance:", balance);
+  // if (DEBUG) console.log("🤗 balance:", balance);
 
   const isInclaimList = useContractReader(readContracts, "DappLearningCollectible", "claimedBitMap", [address]);
 
@@ -247,13 +240,13 @@ function App(props) {
   }, [loadWeb3Modal]);
 
   let faucetHint = "";
-  const faucetAvailable =
-    localProvider &&
-    localProvider.connection &&
-    localProvider.connection.url &&
-    localProvider.connection.url.indexOf(window.location.hostname) >= 0 &&
-    !process.env.REACT_APP_PROVIDER &&
-    price > 1;
+  // const faucetAvailable =
+  //   localProvider &&
+  //   localProvider.connection &&
+  //   localProvider.connection.url &&
+  //   localProvider.connection.url.indexOf(window.location.hostname) >= 0 &&
+  //   !process.env.REACT_APP_PROVIDER &&
+  //   price > 1;
 
   const [faucetClicked, setFaucetClicked] = useState(false);
   //if(!faucetClicked&&localProvider&&localProvider._network&&localProvider._network.chainId==31337&&yourLocalBalance&&formatEther(yourLocalBalance)<=0){
@@ -549,7 +542,7 @@ function App(props) {
             </div> */}
           </div>
         ) : (
-          <div style={{ minHeight: "50px", marginTop: "4px", padding: "0 8px", textAlign: "left" }}>
+          <div style={{ minHeight: "50px", marginTop: "4px", padding: "0 8px", textAlign: "left" }} key={id}>
             {!isApproved && "if you want start an auction, you should approve this collectible🙌"}
           </div>
         ),
@@ -729,7 +722,7 @@ function App(props) {
         localProvider={localProvider}
         userProvider={userProvider}
         mainnetProvider={mainnetProvider}
-        price={price}
+        // price={price}
         web3Modal={web3Modal}
         loadWeb3Modal={loadWeb3Modal}
         logoutOfWeb3Modal={logoutOfWeb3Modal}
@@ -740,33 +733,9 @@ function App(props) {
       <BrowserRouter>
         <NavBar />
         <Switch>
+          
+          {/* yourcollectibles */}
           <Route exact path="/">
-            {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-            <div style={{ maxWidth: "1280", margin: "auto", marginTop: 32, paddingBottom: 108 }}>
-              {/* <Button
-                disabled={galleryList.length === 0}
-                onClick={updateYourCollectibles}
-                style={{ marginBottom: "25px" }}
-              >
-                Update collectibles
-              </Button> */}
-
-              {galleryList?.length ? (
-                <StackGrid columnWidth={416} gutterWidth={16} gutterHeight={32}>
-                  {galleryList}
-                </StackGrid>
-              ) : !load ? (
-                <NoData style={{ marginTop: 50 }} />
-              ) : null}
-            </div>
-          </Route>
-
-          <Route path="/yourcollectibles">
             <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
               {isInclaimList !== undefined && !isInclaimList && (
                 <Button
@@ -785,8 +754,7 @@ function App(props) {
                     );
                   }}
                 >
-                  <PrinterOutlined />
-                  Mint
+                  {address ? getProof(address).length === 0 ? 'No permission to mint' : 'Mint' : 'Connect Wallet'}
                 </Button>
               )}
               <List
@@ -845,6 +813,33 @@ function App(props) {
                   );
                 }}
               />
+            </div>
+          </Route>
+
+          {/* gallery */}
+          <Route exact path="/gallery">
+            {/*
+                🎛 this scaffolding is full of commonly used components
+                this <Contract/> component will automatically parse your ABI
+                and give you a form to interact with it locally
+            */}
+
+            <div style={{ maxWidth: "1280", margin: "auto", marginTop: 32, paddingBottom: 108 }}>
+              {/* <Button
+                disabled={galleryList.length === 0}
+                onClick={updateYourCollectibles}
+                style={{ marginBottom: "25px" }}
+              >
+                Update collectibles
+              </Button> */}
+
+              {galleryList?.length ? (
+                <StackGrid columnWidth={416} gutterWidth={16} gutterHeight={32}>
+                  {galleryList}
+                </StackGrid>
+              ) : !load ? (
+                <NoData style={{ marginTop: 50 }} />
+              ) : null}
             </div>
           </Route>
 
@@ -918,6 +913,7 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
           </Route>
+
         </Switch>
       </BrowserRouter>
 

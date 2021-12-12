@@ -5,8 +5,8 @@ import { useHistory } from "react-router";
 import { bgColor, textColor, activeColor } from "../theme"
 
 const nav = [
-  { label: "Gallery", path: "/" },
   { label: "YourCollectibles", path: "/yourcollectibles" },
+  { label: "Gallery", path: "/gallery" },
   { label: "Transfers", path: "/transfers" },
   /* { label: "IPFS Upload", path: "/ipfsup" }, */
   /* { label: "Debug Contracts", path: "/debugcontracts" }, */
