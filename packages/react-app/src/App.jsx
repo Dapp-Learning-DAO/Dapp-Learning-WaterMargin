@@ -38,6 +38,7 @@ import { Loading, useLoading } from "./components/Loading";
 import { NFTImage } from "./components/Image";
 import { NoData } from "./components/NoData";
 import { Header, NavBar } from "./components/Header";
+import { Transfer } from "./pages/transfer";
 
 const { BufferList } = require("bl");
 // https://www.npmjs.com/package/ipfs-http-client
@@ -228,7 +229,7 @@ function App(props) {
   // console.log("localChainId=====", localChainId);
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
-      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown Network"} Network, you should choose ${targetNetwork?.name} Network`)
+      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${targetNetwork?.name} Network`)
       setNetwork(NETWORK(selectedChainId)?.name || "Unknown")
     } else {
       setNetwork(targetNetwork?.name)
@@ -849,22 +850,7 @@ function App(props) {
           </Route>
 
           <Route path="/transfers">
-            <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
-              <List
-                bordered
-                dataSource={transferEvents}
-                renderItem={item => {
-                  console.log(item)
-                  return (
-                    <List.Item key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}>
-                      <span style={{ fontSize: 16, marginRight: 8 }}>#{item[2].toNumber()}</span>
-                      <Address address={item[0]} ensProvider={mainnetProvider} fontSize={16} /> {"=>"}
-                      <Address address={item[1]} ensProvider={mainnetProvider} fontSize={16} />
-                    </List.Item>
-                  );
-                }}
-              />
-            </div>
+            <Transfer transferEvents={transferEvents} loadedAssets={loadedAssets} mainnetProvider={mainnetProvider} />
           </Route>
 
           <Route path="/ipfsup">
