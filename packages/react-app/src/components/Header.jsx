@@ -9,7 +9,7 @@ const nav = [
   { label: "YourCollectibles", path: "/yourcollectibles" },
   { label: "Transfers", path: "/transfers" },
   /* { label: "IPFS Upload", path: "/ipfsup" }, */
-  { label: "Debug Contracts", path: "/debugcontracts" },
+  /* { label: "Debug Contracts", path: "/debugcontracts" }, */
 ]
 
 export const NavBar = () => {
@@ -38,7 +38,7 @@ export const NavBar = () => {
 }
 
 export const Header = (props) => {
-  const { address, localProvider, userProvider, mainnetProvider, price, loadWeb3Modal, web3Modal, logoutOfWeb3Modal, blockExplorer, faucetHint } = props
+  const { address, localProvider, userProvider, mainnetProvider, price, loadWeb3Modal, web3Modal, logoutOfWeb3Modal, blockExplorer, networkDisplay, targetNetwork } = props
   return (<>
     <div style={{ backgroundImage: `linear-gradient(to right, ${bgColor}, #f7e3b5)`, display: "flex", justifyContent: "space-between", alignItems: "center", paddingLeft: 20, paddingRight: 20, height: 60 }}>
       <div style={{ display: "flex", alignItems: "center" }}>
@@ -49,7 +49,9 @@ export const Header = (props) => {
       </div>
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "relative" }}>
-        {web3Modal?.cachedProvider && props?.networkDisplay}
+        {web3Modal?.cachedProvider && networkDisplay && <div style={{ zIndex: -1, position: "absolute", right: 128, top: 18, color: targetNetwork?.color, zIndex: 10, fontStyle: "italic" }}>
+          {networkDisplay}
+        </div>}
         <Account
           address={address}
           localProvider={localProvider}
@@ -61,9 +63,9 @@ export const Header = (props) => {
           logoutOfWeb3Modal={logoutOfWeb3Modal}
           blockExplorer={blockExplorer}
         />
-        <div style={{ position: "absolute", top: 50, right: 0 }}>
+        {/* <div style={{ position: "absolute", top: 50, right: 0 }}>
           {faucetHint}
-        </div>
+        </div> */}
       </div>
     </div>
   </>)

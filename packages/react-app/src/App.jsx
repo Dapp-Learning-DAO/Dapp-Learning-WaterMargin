@@ -4,7 +4,7 @@ import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
 import "./App.css";
 import "antd/dist/antd.css";
-import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty } from "antd";
+import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty, message } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
@@ -223,32 +223,17 @@ function App(props) {
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
   */
 
-  let networkDisplay = "";
+  const [networkDisplay, setNetwork] = useState("")
   // console.log("selectedChainId=====", selectedChainId);
   // console.log("localChainId=====", localChainId);
-  if (localChainId && selectedChainId && localChainId != selectedChainId) {
-    networkDisplay = (
-      <div style={{ zIndex: 2, position: "absolute", right: 0, top: 82, padding: 0 }}>
-        <Alert
-          message={"⚠️ Wrong Network"}
-          description={
-            <div>
-              You have <b>{NETWORK(selectedChainId)?.name || "Unknown Network"}</b> selected and you need to be on{" "}
-              <b>{NETWORK(localChainId)?.name}</b>.
-            </div>
-          }
-          type="error"
-          closable={false}
-        />
-      </div>
-    );
-  } else {
-    networkDisplay = (
-      <div style={{ zIndex: -1, position: "absolute", right: 126, top: 18, color: targetNetwork?.color, zIndex: 10, fontStyle: "italic" }}>
-        {targetNetwork?.name}
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (localChainId && selectedChainId && localChainId != selectedChainId) {
+      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown Network"} Network, you should choose ${targetNetwork?.name} Network`)
+      setNetwork(NETWORK(selectedChainId)?.name || "Unknown")
+    } else {
+      setNetwork(targetNetwork?.name)
+    }
+  }, [localChainId, selectedChainId, targetNetwork])
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -466,7 +451,7 @@ function App(props) {
                   block
                   type="primary"
                   onClick={() => approveWETH()}
-                  // disabled={address * 1 !== owner * 1}
+                // disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
                   Approve my WETH
@@ -638,7 +623,7 @@ function App(props) {
       // if (allowance.lt(price)) {
 
       // }
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const completeAuction = async (tokenId, price) => {
@@ -749,8 +734,8 @@ function App(props) {
         loadWeb3Modal={loadWeb3Modal}
         logoutOfWeb3Modal={logoutOfWeb3Modal}
         blockExplorer={blockExplorer}
-        faucetHint={faucetHint}
         networkDisplay={networkDisplay}
+        targetNetwork={targetNetwork}
       />
       <BrowserRouter>
         <NavBar />
@@ -869,6 +854,7 @@ function App(props) {
                 bordered
                 dataSource={transferEvents}
                 renderItem={item => {
+                  console.log(item)
                   return (
                     <List.Item key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}>
                       <span style={{ fontSize: 16, marginRight: 8 }}>#{item[2].toNumber()}</span>
@@ -938,7 +924,7 @@ function App(props) {
       {/* <ThemeSwitch /> */}
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10, zIndex: 90 }}>
+      {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10, zIndex: 90 }}>
         <Row align="middle" gutter={[4, 4]}>
           <Col span={8}>
             <Ramp price={price} address={address} networks={NETWORKS} />
@@ -966,7 +952,7 @@ function App(props) {
         <Row align="middle" gutter={[4, 4]}>
           <Col span={24}>
             {
-              /*  if the local provider has a signer, let's show the faucet:  */
+              /*  if the local provider has a signer, let's show the faucet:  * /
               faucetAvailable ? (
                 <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
               ) : (
@@ -976,6 +962,7 @@ function App(props) {
           </Col>
         </Row>
       </div>
+       */}
       <Loading />
     </div>
   );
