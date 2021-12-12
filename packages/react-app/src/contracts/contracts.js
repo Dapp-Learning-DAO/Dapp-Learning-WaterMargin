@@ -1,1 +1,1 @@
-module.exports = ["DappLearningCollectible", "AuctionFixedPrice", "WETH"];
+module.exports = ["AuctionFixedPrice","AuctionUnfixedPrice","DappLearningCollectible","WETH"];

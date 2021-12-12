@@ -30,9 +30,9 @@ function publishContract(contractName) {
       } else {
         graphConfig = '{}'
       }
-      } catch (e) {
-        console.log(e)
-      }
+    } catch (e) {
+      console.log(e)
+    }
 
     graphConfig = JSON.parse(graphConfig)
     graphConfig[contractName + "Address"] = address
@@ -49,8 +49,8 @@ function publishContract(contractName) {
       `module.exports = "${contract.bytecode}";`
     );
 
-    const folderPath = graphConfigPath.replace("/config.json","")
-    if (!fs.existsSync(folderPath)){
+    const folderPath = graphConfigPath.replace("/config.json", "")
+    if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath);
     }
     fs.writeFileSync(
@@ -62,13 +62,13 @@ function publishContract(contractName) {
       JSON.stringify(contract.abi, null, 2)
     );
 
-    console.log(" 📠 Published "+chalk.green(contractName)+" to the frontend.")
+    console.log(" 📠 Published " + chalk.green(contractName) + " to the frontend.")
 
     return true;
   } catch (e) {
-    if(e.toString().indexOf("no such file or directory")>=0){
-      console.log(chalk.yellow(" ⚠️  Can't publish "+contractName+" yet (make sure it getting deployed)."))
-    }else{
+    if (e.toString().indexOf("no such file or directory") >= 0) {
+      console.log(chalk.yellow(" ⚠️  Can't publish " + contractName + " yet (make sure it getting deployed)."))
+    } else {
       console.log(e);
       return false;
     }
@@ -80,22 +80,21 @@ async function main() {
     fs.mkdirSync(publishDir);
   }
   const finalContractList = [];
-  console.log("Sounrce of file========",bre.config.paths.sources);
   fs.readdirSync(bre.config.paths.sources).forEach((file) => {
-    console.log("File name======",file);
     if (file.indexOf(".sol") >= 0) {
       const contractName = file.replace(".sol", "");
-      console.log("After replace ======",contractName);
       // Add contract to list if publishing is successful
+      publishContract(contractName)
+      finalContractList.push(contractName);
       if (publishContract(contractName)) {
-        finalContractList.push(contractName);
-      }
+         finalContractList.push(contractName);
+       }
     }
   });
-  fs.writeFileSync(
+  /* fs.writeFileSync(
     `${publishDir}/contracts.js`,
     `module.exports = ${JSON.stringify(finalContractList)};`
-  );
+  ); */
 }
 main()
   .then(() => process.exit(0))
