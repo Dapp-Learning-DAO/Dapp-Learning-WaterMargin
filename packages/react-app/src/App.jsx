@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
@@ -735,7 +735,7 @@ function App(props) {
         <Switch>
           
           {/* yourcollectibles */}
-          <Route path="/yourcollectibles">
+          <Route exact path="/">
             <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
               {isInclaimList !== undefined && !isInclaimList && (
                 <Button
@@ -913,6 +913,7 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
           </Route>
+
         </Switch>
       </BrowserRouter>
 
