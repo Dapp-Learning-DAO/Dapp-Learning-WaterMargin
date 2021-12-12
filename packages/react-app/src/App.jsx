@@ -177,7 +177,6 @@ function App(props) {
   const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI);
   if (DEBUG) console.log("🌍 DAI contract on mainnet:", mainnetDAIContract);
 
-
   // keep track of a variable from the contract in the local React state:
   // const balance = useContractReader(readContracts, "DappLearningCollectible", "balanceOf", [address]);
   // if (DEBUG) console.log("🤗 balance:", balance);
@@ -205,6 +204,8 @@ function App(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [auctionDetails, setAuctionDetails] = useState({ price: "", duration: "" });
   const [auctionToken, setAuctionToken] = useState("");
+  const [auctionArr, setAuctionArr] = useState([]);
+  const [cancelArr, setCancelArr] = useState([]);
   //
   // 🧠 This effect will update yourCollectibles by polling when your balance changes
   //
@@ -216,17 +217,21 @@ function App(props) {
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
   */
 
-  const [networkDisplay, setNetwork] = useState("")
+  const [networkDisplay, setNetwork] = useState("");
   // console.log("selectedChainId=====", selectedChainId);
   // console.log("localChainId=====", localChainId);
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
-      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown Network"} Network, you should choose ${targetNetwork?.name} Network`)
-      setNetwork(NETWORK(selectedChainId)?.name || "Unknown")
+      message.warn(
+        `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown Network"} Network, you should choose ${
+          targetNetwork?.name
+        } Network`,
+      );
+      setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
     } else {
-      setNetwork(targetNetwork?.name)
+      setNetwork(targetNetwork?.name);
     }
-  }, [localChainId, selectedChainId, targetNetwork])
+  }, [localChainId, selectedChainId, targetNetwork]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -413,8 +418,20 @@ function App(props) {
     if (!address || !loadedAssets) return;
     let list = [];
     setGalleryList(null);
+    let new_auc_arr = [...auctionArr];
+    let new_cancel_arr = [...cancelArr];
     for (let a in loadedAssets ? loadedAssets.slice(0, 6) : []) {
-      let { auctionInfo, owner, id, forSale, name, external_url, image, description, isAuction } = loadedAssets[a];
+      let { auctionInfo, owner, id, forSale, name, external_url, rank, image, description, isAuction } = loadedAssets[
+        a
+      ];
+
+      if (isAuction && auctionArr.includes(id)) {
+        new_auc_arr = new_auc_arr.filter(e => e !== id);
+      }
+
+      if (!isAuction && cancelArr.includes(id)) {
+        new_cancel_arr = new_cancel_arr.filter(e => e !== id);
+      }
 
       let cardActions = [];
       let auctionDetails = [];
@@ -444,7 +461,7 @@ function App(props) {
                   block
                   type="primary"
                   onClick={() => approveWETH()}
-                // disabled={address * 1 !== owner * 1}
+                  // disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
                   Approve my WETH
@@ -459,6 +476,7 @@ function App(props) {
                   type="primary"
                   onClick={() => (!isApproved ? approveAll() : startAuction(id))}
                   disabled={address * 1 !== owner * 1}
+                  loading={auctionArr.includes(id)}
                 >
                   <FlagOutlined />
                   {!isApproved ? "Approve this collectible" : "Start auction"}
@@ -479,6 +497,7 @@ function App(props) {
                   danger
                   type="text"
                   onClick={() => cancelAuction(id)}
+                  loading={cancelArr.includes(id)}
                 >
                   <FireOutlined />
                   Cancel
@@ -496,7 +515,7 @@ function App(props) {
         isAuction ? (
           <div style={{ marginTop: "4px", textAlign: "left" }} key={id}>
             <div style={{ fontWeight: "bold", display: "flex", padding: "0 8px" }}>
-              <span style={{ flex: 1 }}>{!isEnded ? `in progress` : "ended"}</span>
+              <span style={{ flex: 1 }}>{!isEnded ? `in progress` : "the auction has ended"}</span>
               <span>
                 price: <span style={{ color: "rgb(24, 144, 255)", fontSize: "16px" }}>{utils.formatEther(price)}</span>{" "}
                 WETH
@@ -562,7 +581,10 @@ function App(props) {
               alignItems: "center",
             }}
           >
-            {description}
+            <div style={{ position: "relative" }}>
+              <div style={{ position: "absolute", top: "-22px" }}>Rank {rank}:</div>
+              <div>{description}</div>
+            </div>
             {owner && (
               <Address
                 address={owner}
@@ -582,6 +604,8 @@ function App(props) {
     }
     closeLoading();
     setGalleryList([...list]);
+    setAuctionArr(new_auc_arr);
+    setCancelArr(new_cancel_arr);
   }, [loadedAssets, address]);
 
   const startAuction = tokenUri => {
@@ -604,7 +628,7 @@ function App(props) {
     try {
       const auctionAddress = readContracts.AuctionFixedPrice.address;
       await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const approveWETH = async () => {
@@ -616,7 +640,7 @@ function App(props) {
       // if (allowance.lt(price)) {
 
       // }
-    } catch (err) { }
+    } catch (err) {}
   };
 
   const completeAuction = async (tokenId, price) => {
@@ -638,13 +662,13 @@ function App(props) {
   const cancelAuction = async tokenId => {
     const nftAddress = readContracts.DappLearningCollectible.address;
     await tx(writeContracts.AuctionFixedPrice.cancelAution(nftAddress, tokenId));
+    !cancelArr.includes(tokenId) && setCancelArr([...cancelArr, tokenId]);
   };
 
   const handleOk = async () => {
     setModalVisible(false);
     const { price, duration } = auctionDetails;
     const tokenId = auctionToken;
-
     const auctionAddress = readContracts.AuctionFixedPrice.address;
     const nftAddress = readContracts.DappLearningCollectible.address;
     const WETH_Address = readContracts.WETH.address;
@@ -660,7 +684,7 @@ function App(props) {
       }
 
       const ethPrice = utils.parseEther(price.toString());
-      const blockDuration = Math.floor(new Date().getTime() / 1000) + duration;
+      const blockDuration = Math.floor(new Date().getTime() / 1000) + duration * 3600 * 24;
 
       await tx(
         writeContracts.AuctionFixedPrice.createTokenAuction(
@@ -676,6 +700,7 @@ function App(props) {
       );
       const auctionInfo = await readContracts.AuctionFixedPrice.getTokenAuctionDetails(nftAddress, tokenId);
       console.log("auctionInfo", { auctionInfo });
+      !auctionArr.includes(tokenId) && setAuctionArr([...auctionArr, tokenId]);
     } catch (err) {
       console.error(err);
     }
@@ -706,9 +731,9 @@ function App(props) {
         </div>
         <br />
         <div style={{ display: "flex", alignItems: "center" }}>
-          <p style={{ margin: 0, marginRight: "15px" }}>Duration in seconds: </p>
+          <p style={{ margin: 0, marginRight: "15px" }}>Duration in days: </p>
           <InputNumber
-            placeholder="3600"
+            placeholder="1"
             value={auctionDetails.duration}
             onChange={newDuration => setAuctionDetails({ ...auctionDetails, duration: newDuration })}
             style={{ flexGrow: 1 }}
@@ -733,7 +758,6 @@ function App(props) {
       <BrowserRouter>
         <NavBar />
         <Switch>
-          
           {/* yourcollectibles */}
           <Route exact path="/">
             <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
@@ -754,7 +778,7 @@ function App(props) {
                     );
                   }}
                 >
-                  {address ? getProof(address).length === 0 ? 'No permission to mint' : 'Mint' : 'Connect Wallet'}
+                  {address ? (getProof(address).length === 0 ? "No permission to mint" : "Mint") : "Connect Wallet"}
                 </Button>
               )}
               <List
@@ -849,7 +873,7 @@ function App(props) {
                 bordered
                 dataSource={transferEvents}
                 renderItem={item => {
-                  console.log(item)
+                  console.log(item);
                   return (
                     <List.Item key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}>
                       <span style={{ fontSize: 16, marginRight: 8 }}>#{item[2].toNumber()}</span>
@@ -913,7 +937,6 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
           </Route>
-
         </Switch>
       </BrowserRouter>
 
