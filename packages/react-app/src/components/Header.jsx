@@ -21,9 +21,10 @@ export const NavBar = () => {
       display: "flex",
       alignItems: "center",
       width: 500,
-      position: "absolute",
+      position: "fixed",
       top: 20,
-      left: 400
+      left: 400,
+      zIndex: 13
     }}>
       {nav?.map(item => {
         return (<div
@@ -47,7 +48,11 @@ export const Header = (props) => {
     paddingLeft: 20,
     paddingRight: 20,
     height: 60,
-    minWidth: minWidth
+    minWidth: minWidth,
+    width: "100%",
+    position: "fixed",
+    zIndex: 12,
+    top: 0
   }}>
     <div style={{ display: "flex", alignItems: "center" }}>
       <div style={{ fontSize: 24, fontWeight: "sold", marginRight: 20 }}>

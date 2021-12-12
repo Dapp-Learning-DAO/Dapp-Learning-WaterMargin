@@ -687,7 +687,7 @@ function App(props) {
   };
 
   return (
-    <div className="App">
+    <div className="App" style={{ paddingTop: 60 }}>
       <Modal
         title="Start auction"
         visible={modalVisible}
@@ -734,7 +734,7 @@ function App(props) {
       <BrowserRouter>
         <NavBar />
         <Switch>
-          
+
           {/* yourcollectibles */}
           <Route exact path="/">
             <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
@@ -845,7 +845,12 @@ function App(props) {
           </Route>
 
           <Route path="/transfers">
-            <Transfer transferEvents={transferEvents} loadedAssets={loadedAssets} mainnetProvider={mainnetProvider} />
+            <Transfer
+              transferEvents={transferEvents}
+              loadedAssets={loadedAssets}
+              mainnetProvider={mainnetProvider}
+              nftAddress={readContracts?.DappLearningCollectible?.address}
+              blockExplorer={blockExplorer} />
           </Route>
 
           <Route path="/ipfsup">
