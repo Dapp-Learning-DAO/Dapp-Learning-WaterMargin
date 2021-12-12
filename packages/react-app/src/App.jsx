@@ -19,7 +19,7 @@ import {
   useBalance,
   useExternalContractLoader,
 } from "./hooks";
-import { Faucet, Ramp, Contract, GasGauge, Address, AddressInput } from "./components";
+import { Contract, Address, AddressInput } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import { BigNumber, utils } from "ethers";
@@ -779,7 +779,7 @@ function App(props) {
                     );
                   }}
                 >
-                  {address ? (getProof(address).length === 0 ? "No permission to mint" : "Mint") : "Connect Wallet"}
+                  {web3Modal.cachedProvider ? getProof(address).length === 0 ? 'No permission to mint' : 'Mint' : 'Please connect Wallet'}
                 </Button>
               )}
               <List
