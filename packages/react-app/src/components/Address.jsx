@@ -31,7 +31,7 @@ import { activeColor } from "../theme";
 
 const { Text } = Typography;
 
-export const ellipseAddress = ( address = "", width = 8 ) => `${address.slice(0, width)}...${address.slice(-width)}`;
+export const ellipseAddress = (address = "", width = 8) => `${address.slice(0, width)}...${address.slice(-width)}`;
 
 const blockExplorerLink = (address, blockExplorer) => `${blockExplorer || "https://etherscan.io/"}${"address/"}${address}`;
 
@@ -51,7 +51,7 @@ export default function Address(props) {
 
   let displayAddress = address.substr(0, 6);
 
-  if (ens && ens.indexOf("0x")<0) {
+  if (ens && ens.indexOf("0x") < 0) {
     displayAddress = ens;
   } else if (Number(props.size) >= 2) {
     displayAddress = ellipseAddress(address, props.size);
@@ -70,16 +70,22 @@ export default function Address(props) {
 
   let text;
   if (props.onChange) {
-    text = (
-      <Text editable={{ onChange: props.onChange }} copyable={{ text: address }}>
+    text = (props.disableCopy
+      ? <a style={{ color: activeColor }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer" >
+        {displayAddress}
+      </a >
+      : <Text editable={{ onChange: props.onChange }} copyable={{ text: address }}>
         <a style={{ color: activeColor }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
           {displayAddress}
         </a>
       </Text>
     );
   } else {
-    text = (
-      <Text copyable={{ text: address }}>
+    text = (props.disableCopy
+      ? <a style={{ color: activeColor }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer" >
+        {displayAddress}
+      </a >
+      : <Text copyable={{ text: address }}>
         <a style={{ color: activeColor }} target={"_blank"} href={etherscanLink} rel="noopener noreferrer">
           {displayAddress}
         </a>
@@ -89,9 +95,9 @@ export default function Address(props) {
 
   return (
     <span>
-      { !props.disableBlockies && <span style={{ verticalAlign: "middle", marginBottom: -5, display: "inline-block"}}>
-        <Blockies seed={address.toLowerCase()} size={8} scale={props.fontSize?props.fontSize/7:4}/>
-      </span> }
+      { !props.disableBlockies && <span style={{ verticalAlign: "middle", marginBottom: -5, display: "inline-block" }}>
+        <Blockies seed={address.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+      </span>}
       <span style={{ verticalAlign: "middle", fontSize: props.fontSize ? props.fontSize : 28, zIndex: 12 }}>{text}</span>
     </span>
   );
