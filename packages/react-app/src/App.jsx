@@ -173,10 +173,6 @@ function App(props) {
   if (DEBUG) console.log("🔐 writeContracts", writeContracts);
 
   // EXTERNAL CONTRACT EXAMPLE:
-  //
-  // If you want to bring in the mainnet DAI contract it would look like:
-  const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI);
-  if (DEBUG) console.log("🌍 DAI contract on mainnet:", mainnetDAIContract);
 
   // keep track of a variable from the contract in the local React state:
   // const balance = useContractReader(readContracts, "DappLearningCollectible", "balanceOf", [address]);
@@ -255,12 +251,12 @@ function App(props) {
   let assetKeys = Object.keys(assets);
 
   const { loading, error, data } = useQuery(dappLearningCollectibles, {
-    pollInterval: 800,
+    pollInterval: 5000,
   });
   // const { loading, error, data } = useQuery(getCurrentColl);
   const currentColl = useQuery(getCurrentColl, {
     variables: { address: address },
-    pollInterval: 800,
+    pollInterval: 5000,
   });
 
   const [transferToAddresses, setTransferToAddresses] = useState({});
