@@ -13,7 +13,7 @@ export function handleApprovalForAll(event: ApprovalForAll): void {}
 
 export function handleTransfer(event: Transfer): void {
   let zeroAddr = Address.fromHexString("0x0000000000000000000000000000000000000000");
-  let auctionAddr = Address.fromHexString("0x26aa59598210AE7613d5Bf3aCB01416fdaf6EBe7");
+  let auctionAddr = Address.fromHexString("0xe19E5e2782D735a73729cA72718CB6609Af424f4");
 
   let id = event.params.tokenId.toHex();
   let to = event.params.to;
