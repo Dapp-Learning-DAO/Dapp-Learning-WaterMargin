@@ -36,11 +36,11 @@ export const SearchQuery = ({ list, setData, assets }) => {
 
   const sortList = [
     {
-      label: "按时间降序",
+      label: "按时间倒序",
       value: "id-desc",
     },
     {
-      label: "按时间升序",
+      label: "按时间正序",
       value: "id-asc",
     },
   ]
@@ -50,9 +50,9 @@ export const SearchQuery = ({ list, setData, assets }) => {
     const nameList = tokenId ? ownerList?.filter(item => item?.tokenId["_hex"] === tokenId) : ownerList
     let sortList;
     if (sort === "id-desc") {
-      sortList = nameList?.sort((a, b) => parseInt(a?.tokenId["_hex"]) - parseInt(b?.tokenId["_hex"]));
+      sortList = nameList?.sort((a, b) => parseInt(b?.blockNumber) - parseInt(a?.blockNumber));
     } else {
-      sortList = nameList?.sort((a, b) => parseInt(b?.tokenId["_hex"]) - parseInt(a?.tokenId["_hex"]));
+      sortList = nameList?.sort((a, b) => parseInt(a?.blockNumber) - parseInt(b?.blockNumber));
     }
     setData(sortList)
   }, [list, owner, tokenId, sort])
