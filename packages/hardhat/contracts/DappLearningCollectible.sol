@@ -13,6 +13,8 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract DappLearningCollectible is ERC721URIStorage{
 
+  event Mint(address sender, uint256 tokenID, string URL);
+
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
 
@@ -74,13 +76,16 @@ contract DappLearningCollectible is ERC721URIStorage{
     uint random = rand(seed) % RANKLENGTH;
     uint256 rank = getFreeRank(random);
 
-    _setTokenURI(id, uint2str(rank));
+    string memory url = uint2str(rank);
+    _setTokenURI(id, url);
 
     validRank[rank] = true;
 
     claimedBitMap[msg.sender] = true;
 
     RANKCOUNTER++;
+
+    emit Mint(msg.sender,id, url);
 
     return id;
   }
