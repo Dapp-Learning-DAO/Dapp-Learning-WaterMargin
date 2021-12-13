@@ -220,18 +220,14 @@ function App(props) {
   const [networkDisplay, setNetwork] = useState("");
   // console.log("selectedChainId=====", selectedChainId);
   // console.log("localChainId=====", localChainId);
-  // useEffect(() => {
-  //   if (localChainId && selectedChainId && localChainId != selectedChainId) {
-  //     message.warn(
-  //       `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${
-  //         targetNetwork?.name
-  //       } Network`,
-  //     );
-  //     setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
-  //   } else {
-  //     setNetwork(targetNetwork?.name);
-  //   }
-  // }, [localChainId, selectedChainId, targetNetwork]);
+  useEffect(() => {
+    if (localChainId && selectedChainId && localChainId != selectedChainId) {
+      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown Network"} Network, you should choose ${targetNetwork?.name} Network`)
+      setNetwork(NETWORK(selectedChainId)?.name || "Unknown")
+    } else {
+      setNetwork(targetNetwork?.name)
+    }
+  }, [localChainId, selectedChainId, targetNetwork])
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
