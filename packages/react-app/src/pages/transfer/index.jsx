@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty, message } from "antd";
-import { Faucet, Ramp, Contract, GasGauge, Address, AddressInput } from "../../components";
+import { Address } from "../../components";
 import { activeColor, bgColor, mainWidth } from "../../theme";
 import StackGrid from "react-stack-grid";
 import { SearchQuery } from "./SearchQuery"
@@ -12,8 +11,7 @@ export const Transfer = (props) => {
   const { mainnetProvider, transferEvents, loadedAssets, blockExplorer, nftAddress } = props
   const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
   const assets = useMemo(() => {
-    if (!Array.isArray(loadedAssets)) return null
-    if (!loadedAssets?.length) return null
+    if (!(Array.isArray(loadedAssets) && loadedAssets?.length)) return null
     const asset = {};
     for (let i = 0; i < loadedAssets?.length; i++) {
       asset[parseInt(loadedAssets[i].id)] = loadedAssets[i]
@@ -31,6 +29,7 @@ export const Transfer = (props) => {
       </div>
       { assets ? <StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
         {data?.map(item => {
+          if (!(assets && assets[parseInt(item.tokenId["_hex"])]?.image)) return null
           return (
             <div
               key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}
@@ -70,7 +69,6 @@ export const Transfer = (props) => {
                 marginTop: 10
               }}>
                 {assets && assets[parseInt(item.tokenId["_hex"])]?.description && <span style={{ fontSize: 16, marginRight: 8 }}>{assets[parseInt(item.tokenId["_hex"])]?.description}</span>}
-                {/* <div style={{  }}>{item?.blockNumber}</div> */}
                 <div style={{ color: activeColor }}>
                   <Address address={item[0]} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={5} disableBlockies disableCopy />&nbsp;&nbsp;{"=>"}&nbsp;&nbsp;
                   <Address address={item[1]} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={5} disableBlockies disableCopy />
@@ -81,7 +79,7 @@ export const Transfer = (props) => {
         })}
       </StackGrid> : !loading ? (
         <NoData style={{ marginTop: 50 }} />
-      ) : null }
+      ) : null}
     </div>
   )
 }

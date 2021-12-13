@@ -24,7 +24,7 @@ export const NavBar = () => {
       position: "fixed",
       top: 20,
       left: 400,
-      zIndex: 13
+      zIndex: 10001
     }}>
       {nav?.map(item => {
         return (<div
@@ -51,7 +51,7 @@ export const Header = (props) => {
     minWidth: minWidth,
     width: "100%",
     position: "fixed",
-    zIndex: 12,
+    zIndex: 10000,
     top: 0
   }}>
     <div style={{ display: "flex", alignItems: "center" }}>
