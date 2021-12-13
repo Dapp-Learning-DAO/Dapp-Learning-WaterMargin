@@ -5,6 +5,9 @@ import StackGrid from "react-stack-grid";
 import { SearchQuery } from "./SearchQuery"
 import { useLoading } from "../../components/Loading";
 import { NoData } from "../../components/NoData";
+import { Image } from "antd";
+import errorImage from "./errorImge.jpg"
+import { LoadingCore } from "../../components/Loading"
 
 export const Transfer = (props) => {
   const { loading } = useLoading();
@@ -27,9 +30,8 @@ export const Transfer = (props) => {
         {data?.length > 0 ? <div> 共{data?.length}条记录</div> : <div style={{ color: "transparent" }}> 共{data?.length}条记录</div>}
         {transferEvents?.length > 0 && <SearchQuery list={transferEvents} setData={setData} assets={assets} />}
       </div>
-      { assets ? <StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
+      {transferEvents?.length > 0 ? <StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
         {data?.map(item => {
-          if (!(assets && assets[parseInt(item.tokenId["_hex"])]?.image)) return null
           return (
             <div
               key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}
@@ -38,13 +40,35 @@ export const Transfer = (props) => {
                 background: bgColor,
                 boxShadow: "10px 10px 10px rgba(0,0,0,0.7)",
                 width: 250,
-                minHeight: assets ? 275 : 180,
+                height: 275,
+                minHeight: 275,
                 borderRadius: 5,
                 border: `1px solid ${bgColor}`,
                 textAlign: "left",
                 color: "rgba(0,0,0,0.7)"
               }}>
-              { assets && assets[parseInt(item.tokenId["_hex"])]?.image && <img src={assets[parseInt(item.tokenId["_hex"])]?.image} style={{ borderRadius: 5 }} />}
+              <Image
+                width={250}
+                height={186}
+                key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}
+                preview={{ mask: null }}
+                src={assets ? assets[parseInt(item.tokenId["_hex"])]?.image : "http"}
+                placeholder={
+                  <div style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: "#F2F2F2"
+                  }}>
+                    <div style={{ marginLeft: -20, marginTop: -60 }}>
+                      <LoadingCore scale={2} />
+                    </div>
+                  </div>
+                }
+                fallback={errorImage}
+              />
               <a
                 style={{
                   fontSize: 20,
@@ -59,7 +83,8 @@ export const Transfer = (props) => {
                   marginLeft: 105,
                   cursor: "pointer",
                   fontStyle: "italic",
-                  color: "rgba(0,0,0,0.7)"
+                  color: "rgba(0,0,0,0.7)",
+                  zIndex: 100
                 }}
                 target="_blank"
                 href={blockExplorerLink(nftAddress, item[2].toNumber())}
@@ -78,7 +103,7 @@ export const Transfer = (props) => {
           );
         })}
       </StackGrid> : !loading ? (
-        <NoData style={{ marginTop: 50 }} />
+        <NoData style={{ marginTop: 28 }} />
       ) : null}
     </div>
   )

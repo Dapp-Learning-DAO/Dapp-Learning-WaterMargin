@@ -222,7 +222,7 @@ function App(props) {
   // console.log("localChainId=====", localChainId);
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
-      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown Network"} Network, you should choose ${targetNetwork?.name} Network`)
+      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${targetNetwork?.name} Network`)
       setNetwork(NETWORK(selectedChainId)?.name || "Unknown")
     } else {
       setNetwork(targetNetwork?.name)
