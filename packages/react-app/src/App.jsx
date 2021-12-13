@@ -222,12 +222,16 @@ function App(props) {
   // console.log("localChainId=====", localChainId);
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
-      message.warn(`You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${targetNetwork?.name} Network`)
-      setNetwork(NETWORK(selectedChainId)?.name || "Unknown")
+      message.warn(
+        `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${
+          targetNetwork?.name
+        } Network`,
+      );
+      setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
     } else {
-      setNetwork(targetNetwork?.name)
+      setNetwork(targetNetwork?.name);
     }
-  }, [localChainId, selectedChainId, targetNetwork])
+  }, [localChainId, selectedChainId, targetNetwork]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -251,7 +255,8 @@ function App(props) {
   const [yourBid, setYourBid] = useState({});
   const [galleryList, setGalleryList] = useState([]);
   const [timer, setTimer] = useState();
-  const [id_rank, setId_rank] = useState();
+  const [id_rank, setId_rank] = useState({});
+  const [isUpdating, setIsUpdating] = useState(false);
   let assetKeys = Object.keys(assets);
 
   const { loading, error, data } = useQuery(dappLearningCollectibles, {
@@ -260,32 +265,35 @@ function App(props) {
   // const { loading, error, data } = useQuery(getCurrentColl);
   const currentColl = useQuery(getCurrentColl, {
     variables: { address: address },
-    pollInterval: 800,
+    pollInterval: 2000,
   });
 
   const [transferToAddresses, setTransferToAddresses] = useState({});
 
   const [loadedAssets, setLoadedAssets] = useState();
 
-  useEffect(() => {
-    try {
-      // Fix an issue where an error in the following code causes the page to crash
-      setId_rank(JSON.parse(localStorage.getItem("id_rank")) || {});
-    } catch (error) {
-      console.log(error);
-    }
-    return () => {
-      localStorage.setItem("id_rank", JSON.stringify(id_rank));
-    };
-  }, []);
+  // useEffect(() => {
+  //   try {
+  //     console.log("???");
+  //     // Fix an issue where an error in the following code causes the page to crash
+  //     setId_rank(!!localStorage.getItem("id_rank") ? JSON.parse(localStorage.getItem("id_rank")) : {});
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   return () => {
+  //     localStorage.setItem("id_rank", JSON.stringify(id_rank));
+  //     console.log("id_rank", id_rank);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (data) {
+      if (!timer) updateYourCollectibles();
       clearInterval(timer);
       setTimer(
         setInterval(() => {
           updateYourCollectibles();
-        }, 1000),
+        }, 3000),
       );
     }
   }, [data, readContracts]);
@@ -328,14 +336,15 @@ function App(props) {
 
   const updateYourCollectibles = async () => {
     let assetUpdate = [];
-    if (!readContracts) return;
+    if (!readContracts || isUpdating) return;
+    setIsUpdating(true);
     try {
       // let forSaleArr = await Promise.all(assetKeys.map(a => readContracts.YourCollectible.forSale(utils.id(a))));
       let forSaleArr = data?.dappLearningCollectibles?.map(a => a.isAuction);
       let wait_arr = [];
       let res = await Promise.all(
         data?.dappLearningCollectibles
-        ?.filter(e => !Object.keys(id_rank).includes(e.tokenId))
+          ?.filter(e => !Object.keys(id_rank).includes(e.tokenId))
           .map(e => {
             wait_arr.push(e.tokenId);
             return readContracts.DappLearningCollectible.tokenURI(e.tokenId);
@@ -348,7 +357,6 @@ function App(props) {
         ...e,
         rank: new_obj[e.tokenId],
       }));
-      // console.log(res);
       assetUpdate = await Promise.all(
         ranked_res.map((e, idx) => {
           const forSale = forSaleArr[idx];
@@ -365,6 +373,7 @@ function App(props) {
     } catch (error) {
       console.log(error);
     }
+    setIsUpdating(false);
     setLoadedAssets(assetUpdate);
   };
 
@@ -738,7 +747,11 @@ function App(props) {
                     );
                   }}
                 >
-                  {web3Modal.cachedProvider ? getProof(address).length === 0 ? 'No permission to mint' : 'Mint' : 'Please connect Wallet'}
+                  {web3Modal.cachedProvider
+                    ? getProof(address).length === 0
+                      ? "No permission to mint"
+                      : "Mint"
+                    : "Please connect Wallet"}
                 </Button>
               )}
               <List
@@ -746,6 +759,7 @@ function App(props) {
                 // dataSource={yourCollectibles}
                 dataSource={currentColl?.data?.dappLearningCollectibles}
                 renderItem={item => {
+                  if (!id_rank[item.tokenId]) return;
                   item = { ...item, ...assets[assetKeys[id_rank[item.tokenId]]] };
                   // const id = item.id.toNumber();
                   const id = id_rank[item.tokenId] * 1;
@@ -833,7 +847,8 @@ function App(props) {
               loadedAssets={loadedAssets}
               mainnetProvider={mainnetProvider}
               nftAddress={readContracts?.DappLearningCollectible?.address}
-              blockExplorer={blockExplorer} />
+              blockExplorer={blockExplorer}
+            />
           </Route>
 
           <Route path="/ipfsup">
