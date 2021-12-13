@@ -24,7 +24,7 @@ const DEBUG = false;
 
 export default function useContractReader(contracts, contractName, functionName, args, pollTime, formatter, onChange) {
   // if duration too short will be blocked by rpc(infura)
-  let adjustPollTime = 2000;
+  let adjustPollTime = 4000;
   if (pollTime) {
     adjustPollTime = pollTime;
   } else if (!pollTime && typeof args === "number") {

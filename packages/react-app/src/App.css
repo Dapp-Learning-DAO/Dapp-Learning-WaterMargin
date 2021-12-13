@@ -115,9 +115,6 @@
   width: 200px;
   margin-top: -100px;
   margin-left: -100px;
-  -ms-transform: rotate(-135deg); 
-     -webkit-transform: rotate(-135deg); 
-    transform: rotate(-135deg);
 }
 .object{
   -moz-border-radius: 50% 50% 50% 50%;
