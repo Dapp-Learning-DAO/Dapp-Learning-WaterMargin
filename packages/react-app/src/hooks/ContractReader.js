@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import usePoller from "./Poller";
 import useOnBlock from "./OnBlock";
-import { Provider } from "@ethersproject/providers";
 
 const DEBUG = false;
 
@@ -24,7 +23,8 @@ const DEBUG = false;
 */
 
 export default function useContractReader(contracts, contractName, functionName, args, pollTime, formatter, onChange) {
-  let adjustPollTime = 800;
+  // if duration too short will be blocked by rpc(infura)
+  let adjustPollTime = 2000;
   if (pollTime) {
     adjustPollTime = pollTime;
   } else if (!pollTime && typeof args === "number") {
@@ -32,11 +32,13 @@ export default function useContractReader(contracts, contractName, functionName,
     adjustPollTime = args;
   }
 
+  const [timer, setTimer] = useState();
   const [value, setValue] = useState();
   useEffect(() => {
     if (typeof onChange === "function") {
-      setTimeout(onChange.bind(this, value), 1);
+      setTimer(setTimeout(onChange.bind(this, value), 1));
     }
+    return clearTimeout(timer)
   }, [value, onChange]);
 
   const updateValue = async () => {
@@ -71,13 +73,13 @@ export default function useContractReader(contracts, contractName, functionName,
   }
   })
 
-// Use a poller if a pollTime is provided
-usePoller(async () => {
-  if (contracts && contracts[contractName] && adjustPollTime > 0) {
-    if (DEBUG) console.log('polling!', contractName, functionName)
-    updateValue()
-  }
-}, adjustPollTime, contracts && contracts[contractName])
+  // Use a poller if a pollTime is provided
+  usePoller(async () => {
+    if (contracts && contracts[contractName] && adjustPollTime > 0) {
+      if (DEBUG) console.log('polling!', contractName, functionName)
+      updateValue()
+    }
+  }, adjustPollTime, contracts && contracts[contractName])
 
   return value;
 }

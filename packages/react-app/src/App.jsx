@@ -188,7 +188,6 @@ function App(props) {
   // if (DEBUG) console.log("🤗 balance:", balance);
 
   const isInclaimList = useContractReader(readContracts, "DappLearningCollectible", "claimedBitMap", [address]);
-
   if (DEBUG) console.log("isInclaimList", isInclaimList);
 
   const isApproved = useContractReader(readContracts, "DappLearningCollectible", "isApprovedForAll", [
@@ -221,18 +220,18 @@ function App(props) {
   const [networkDisplay, setNetwork] = useState("");
   // console.log("selectedChainId=====", selectedChainId);
   // console.log("localChainId=====", localChainId);
-  useEffect(() => {
-    if (localChainId && selectedChainId && localChainId != selectedChainId) {
-      message.warn(
-        `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${
-          targetNetwork?.name
-        } Network`,
-      );
-      setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
-    } else {
-      setNetwork(targetNetwork?.name);
-    }
-  }, [localChainId, selectedChainId, targetNetwork]);
+  // useEffect(() => {
+  //   if (localChainId && selectedChainId && localChainId != selectedChainId) {
+  //     message.warn(
+  //       `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${
+  //         targetNetwork?.name
+  //       } Network`,
+  //     );
+  //     setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
+  //   } else {
+  //     setNetwork(targetNetwork?.name);
+  //   }
+  // }, [localChainId, selectedChainId, targetNetwork]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -244,42 +243,6 @@ function App(props) {
       loadWeb3Modal();
     }
   }, [loadWeb3Modal]);
-
-  let faucetHint = "";
-  // const faucetAvailable =
-  //   localProvider &&
-  //   localProvider.connection &&
-  //   localProvider.connection.url &&
-  //   localProvider.connection.url.indexOf(window.location.hostname) >= 0 &&
-  //   !process.env.REACT_APP_PROVIDER &&
-  //   price > 1;
-
-  const [faucetClicked, setFaucetClicked] = useState(false);
-  //if(!faucetClicked&&localProvider&&localProvider._network&&localProvider._network.chainId==31337&&yourLocalBalance&&formatEther(yourLocalBalance)<=0){
-  if (
-    !faucetClicked &&
-    localProvider &&
-    localProvider._network &&
-    yourLocalBalance &&
-    formatEther(yourLocalBalance) <= 0
-  ) {
-    faucetHint = (
-      <div>
-        <Button
-          type={"primary"}
-          onClick={() => {
-            faucetTx({
-              to: address,
-              value: parseEther("0.01"),
-            });
-            setFaucetClicked(true);
-          }}
-        >
-          💰 Grab funds from the faucet ⛽️
-        </Button>
-      </div>
-    );
-  }
 
   const [yourJSON, setYourJSON] = useState(STARTING_JSON);
   const [sending, setSending] = useState();
@@ -376,7 +339,7 @@ function App(props) {
       let wait_arr = [];
       let res = await Promise.all(
         data?.dappLearningCollectibles
-          ?.filter(e => !Object.keys(id_rank).includes(e.tokenId))
+        ?.filter(e => !Object.keys(id_rank).includes(e.tokenId))
           .map(e => {
             wait_arr.push(e.tokenId);
             return readContracts.DappLearningCollectible.tokenURI(e.tokenId);
