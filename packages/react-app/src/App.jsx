@@ -399,7 +399,7 @@ function App(props) {
     let new_auc_arr = [...auctionArr];
     let new_cancel_arr = [...cancelArr];
     for (let a in loadedAssets ? loadedAssets.slice(0, 6) : []) {
-      let { auctionInfo, owner, id, forSale, name, external_url, rank, image, description, isAuction } = loadedAssets[
+      let { auctionInfo, owner, id, forSale, name, external_url, rank, image, description, isAuction, isWanting } = loadedAssets[
         a
       ];
 
@@ -463,7 +463,7 @@ function App(props) {
             )}
             {/* isActive && address === seller */}
             {isAuction && !isEnded && weth_balance >= price && (
-              <Button style={btnStyle} block ghost type="primary" onClick={() => completeAuction(id, price)}>
+              <Button style={btnStyle} block ghost type="primary" disabled={isWanting} onClick={() => completeAuction(id, price)}>
                 I want this
               </Button>
             )}
@@ -636,8 +636,18 @@ function App(props) {
     //   return;
     // }
     const nftAddress = readContracts.DappLearningCollectible.address;
-    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 });
+    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 })
     // updateYourCollectibles();
+    const _list = loadedAssets.map(item => {
+      if (item.id === tokenId) {
+        return {
+          isWanting: true,
+          ...item
+        };
+      }
+      return item;
+    })
+    setLoadedAssets(_list.concat([]))
   };
 
   const cancelAuction = async tokenId => {
