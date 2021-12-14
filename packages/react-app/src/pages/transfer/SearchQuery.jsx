@@ -36,11 +36,11 @@ export const SearchQuery = ({ list, setData, assets }) => {
 
   const sortList = [
     {
-      label: "按时间倒序",
+      label: "Reverse order",
       value: "id-desc",
     },
     {
-      label: "按时间正序",
+      label: "Positive order",
       value: "id-asc",
     },
   ]
@@ -67,7 +67,7 @@ export const SearchQuery = ({ list, setData, assets }) => {
         showSearch
         style={{ width: 420 }}
         allowClear
-        placeholder="选择用户地址"
+        placeholder="Select The User Address"
         optionFilterProp="children"
         onChange={(val) => {
           setList((pre) => ({ ...pre, owner: val }))
@@ -82,7 +82,7 @@ export const SearchQuery = ({ list, setData, assets }) => {
       {assets && <Select
         style={{ width: 200, marginLeft: 20 }}
         allowClear
-        placeholder="选择好汉姓名"
+        placeholder="Select Name"
         optionFilterProp="children"
         onChange={(val) => {
           setList((pre) => ({ ...pre, tokenId: val }))
@@ -91,9 +91,9 @@ export const SearchQuery = ({ list, setData, assets }) => {
         {nameList?.map(item => <Option key={item} value={item}>{`${assets[parseInt(item)]?.description}`}</Option>)}
       </Select>}
       <Select
-        style={{ width: 120, marginLeft: 20 }}
+        style={{ width: 160, marginLeft: 20 }}
         allowClear
-        placeholder="选择排序"
+        placeholder="Select Time Sort"
         optionFilterProp="children"
         onChange={(val) => {
           setList((pre) => ({ ...pre, sort: val }))

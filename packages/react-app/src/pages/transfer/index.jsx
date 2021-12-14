@@ -25,7 +25,7 @@ export const Transfer = (props) => {
   return (
     <div style={{ width: mainWidth, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "auto", width: 1060, textAlign: "left" }}>
-        {data?.length > 0 ? <div> 共{data?.length}条记录</div> : <div style={{ color: "transparent" }}> 共{data?.length}条记录</div>}
+        {data?.length > 0 ? <div> A total of {data?.length} records</div> : <div style={{ color: "transparent" }}> A total of {data?.length} records</div>}
         {transferEvents?.length > 0 && <SearchQuery list={transferEvents} setData={setData} assets={assets} />}
       </div>
       {transferEvents?.length > 0 ? <StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>

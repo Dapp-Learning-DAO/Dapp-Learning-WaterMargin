@@ -217,3 +217,7 @@
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
+.stroke {
+  -webkit-text-stroke: 1px red
+}
