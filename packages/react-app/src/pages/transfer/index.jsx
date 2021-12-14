@@ -50,7 +50,7 @@ export const Transfer = (props) => {
                 height={186}
                 key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}
                 preview={{ mask: null }}
-                src={assets ? assets[parseInt(item.tokenId["_hex"])]?.image : errorImage}
+                src={assets && assets[parseInt(item.tokenId["_hex"])]?.image ? assets[parseInt(item.tokenId["_hex"])]?.image : errorImage}
                 placeholder={
                   <div style={{
                     width: "100%",
@@ -90,7 +90,7 @@ export const Transfer = (props) => {
                 paddingLeft: 10,
                 marginTop: 10
               }}>
-                {assets && assets[parseInt(item.tokenId["_hex"])]?.description && <span style={{ fontSize: 16, marginRight: 8 }}>{assets[parseInt(item.tokenId["_hex"])]?.description}</span>}
+                {assets && assets[parseInt(item.tokenId["_hex"])]?.description && <div className="ellipsis" style={{ fontSize: 16, marginRight: 8 }}>{assets[parseInt(item.tokenId["_hex"])]?.description}</div>}
                 <div style={{ color: activeColor }}>
                   <Address address={item[0]} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={5} disableBlockies disableCopy />&nbsp;&nbsp;{"=>"}&nbsp;&nbsp;
                   <Address address={item[1]} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={5} disableBlockies disableCopy />

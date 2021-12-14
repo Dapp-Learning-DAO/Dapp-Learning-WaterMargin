@@ -211,3 +211,9 @@
   background: rgba(225,225,225, 0.1);
   border-radius: 5px;
 }
+
+.ellipsis {
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Address, AddressInput } from "../../components";
-import { Modal, Button, Image, message } from "antd";
+import { Modal, Button, Image, message, Tooltip } from "antd";
 import { activeColor, mainWidth, bgColor } from "../../theme";
 import StackGrid from "react-stack-grid";
 import errorImage from "../transfer/errorImge.jpg"
@@ -151,8 +151,10 @@ export const YourCollectibles = (props) => {
                 marginTop: 10
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  {item?.description && <span style={{ fontSize: 16, marginRight: 8 }}>{item?.description}</span>}
-                  {`Rank ${id}`}
+                  {item?.description && <Tooltip title={item?.description}>
+                    <div className="ellipsis" style={{ fontSize: 16, marginRight: 8 }}>{item?.description}</div>
+                  </Tooltip>}
+                  <div style={{ width: 70, textAlign: "right" }}>{`Rank ${id}`}</div>
                 </div>
                 <div style={{ color: activeColor, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <Address address={item?.owner} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={6} disableBlockies disableCopy />
@@ -165,7 +167,7 @@ export const YourCollectibles = (props) => {
             </div>
           )
         })}
-      </StackGrid> : <NoData description={"You don't have any WaterMargin NFT!"} style={{ marginTop: 180 }} />}
+      </StackGrid> : <NoData description={"You don't have any WaterMargin NFT!"} />}
       <Modal
         title="Transfer WaterMargin NFT"
         okText={"Transfer"}
