@@ -41,7 +41,7 @@ export const NavBar = () => {
 export const Header = (props) => {
   const { address, localProvider, userProvider, mainnetProvider, price, loadWeb3Modal, web3Modal, logoutOfWeb3Modal, blockExplorer, networkDisplay, targetNetwork } = props
   return (<div style={{
-    backgroundImage: `linear-gradient(to right, ${bgColor}, #f7e3b5)`,
+    backgroundImage: `linear-gradient(to right, #d7b790, #d7b790)`,
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
@@ -52,13 +52,14 @@ export const Header = (props) => {
     width: "100%",
     position: "fixed",
     zIndex: 1000,
-    top: 0
+    top: 0,
+    boxShadow: "0px 5px 5px rgba(0,0,0,0.2)",
   }}>
     <div style={{ display: "flex", alignItems: "center" }}>
       <div style={{ fontSize: 24, fontWeight: "sold", marginRight: 20 }}>
         WaterMargin
         </div>
-      <a href="https://dapp-learning.com" target="_blank" rel="noopener noreferrer" style={{ color: "gray" }}>by Dapp-Learning DAO</a>
+      <a href="https://dapp-learning.com" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(0,0,0,0.5)" }}>by Dapp-Learning DAO</a>
     </div>
     {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
     <div style={{ position: "relative" }}>
