@@ -4,7 +4,7 @@ import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./App.css";
-import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty, notification } from "antd";
+import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Image, notification } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
@@ -35,7 +35,6 @@ import { useQuery } from "@apollo/client";
 import getProof from "./utils/getMerkleTree";
 import { dappLearningCollectibles, getCurrentColl } from "./gql";
 import { Loading, useLoading } from "./components/Loading";
-import { NFTImage } from "./components/Image";
 import { NoData } from "./components/NoData";
 import { Header, NavBar } from "./components/Header";
 import { Transfer } from "./pages/transfer";
@@ -548,7 +547,10 @@ function App(props) {
 
       list.push(
         <div key={name} className={"cardBox"}>
-          <NFTImage image={image} />
+          <Image
+            preview={{ mask: null }}
+            src={image}
+          />
           <div
             style={{
               opacity: 0.77,
@@ -754,6 +756,7 @@ function App(props) {
               setTransferToAddresses={setTransferToAddresses}
               getProof={getProof}
               tx={tx}
+              loadWeb3Modal={loadWeb3Modal}
               nftAddress={readContracts?.DappLearningCollectible?.address}
             />
           </Route>

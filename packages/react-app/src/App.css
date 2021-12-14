@@ -217,13 +217,3 @@
   overflow:hidden;
   text-overflow:ellipsis;
 }
-
-.bg > div {
-  background: rgba(255, 255, 255, .6);
-}
-.g-filter {
-  filter: blur(6px);
-}
-.g-backdrop-filter {
-  backdrop-filter: blur(6px);
-}

@@ -2,7 +2,7 @@ import React from "react";
 import Account from "./Account";
 import { useLocation } from "react-router-dom";
 import { useHistory } from "react-router";
-import { bgColor, textColor, activeColor, minWidth } from "../theme"
+import { textColor, activeColor, minWidth } from "../theme"
 
 const nav = [
   { label: "YourCollectibles", path: "/" },

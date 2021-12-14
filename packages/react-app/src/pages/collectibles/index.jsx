@@ -24,7 +24,8 @@ export const YourCollectibles = (props) => {
     setTransferToAddresses,
     getProof,
     tx,
-    nftAddress
+    nftAddress,
+    loadWeb3Modal
   } = props
 
   const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
@@ -60,22 +61,21 @@ export const YourCollectibles = (props) => {
           height: "100%",
           margin: "auto",
           backdropFilter: "blur(2px)",
-          "-webkit-backdrop-filter": "blur(2px)",
           fontWeight: 1000,
           background: "transparent",
-          textShadow: "2px 5px 5px black",
+          textShadow: "5px 5px 5px #000000",
         }}>
-          <div style={{ width: mainWidth, textAlign: "left", margin: "auto", paddingTop: 150 }}>
-            <p style={{ fontSize: 40 }}>WaterMargin </p>
-            <p style={{ fontSize: 30, margin: "50px auto" }}>《水浒传》是元末明初施耐庵（现存刊本署名》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语</p>
-            <p>《水浒传》是元末明初施耐庵（现存刊本署名》是中国历史上最早用白话文写成的章回小说之一，流传极广，脍炙人口；同时也是汉语言文学中具备史诗特征的作品之一，对中国乃至东亚的叙事文学都有深远的影响。</p>
+          <div style={{ width: mainWidth, textAlign: "left", margin: "auto", paddingTop: 100 }}>
+            <div style={{ fontSize: 40 }}>Water Margin </div>
+            <p style={{ fontSize: 30, margin: "10px auto" }}>Water Margin is a chapter novel written by Shi Naian in the late Yuan and early Ming dynasties in China.</p>
+            <div style={{ fontSize: 20 }}>It tells a story that 108 heroes in the Song Dynasty in China  who rebelled against oppression, were recruited by the emperor, and fought for him, but finally died out. It reflects the main contradiction in feudal society - the contradiction between the peasant class and the landlord class, showing a vigorous peasant revolutionary struggle. It reveals the darkness of the feudal society and the evil of the ruling class, and points out that the social root of the peasant uprising is the cruel feudal oppression and exploitation, and praises the justice of the peasant revolutionary struggle.</div>
             {isInclaimList !== undefined && !isInclaimList && (
               <Button
                 style={{
                   width: 300,
                   height: 40,
                   background: activeColor,
-                  cursor: address && getProof(address).length === 0 ? "no-drop" : "pointer",
+                  cursor: address && getProof(address).length === 0 && web3Modal.cachedProvider ? "no-drop" : "pointer",
                   borderRadius: 4,
                   color: "#FFFFFF",
                   fontSize: 18,
@@ -83,14 +83,23 @@ export const YourCollectibles = (props) => {
                   marginTop: 30,
                   marginBottom: 70,
                 }}
-                disabled={address && getProof(address).length === 0}
+                disabled={address && getProof(address).length === 0 && web3Modal.cachedProvider}
                 onClick={() => {
-                  tx(
-                    writeContracts.DappLearningCollectible.mintItem(
-                      window.crypto.getRandomValues(new Uint32Array(1))[0],
-                      getProof(address),
-                    ),
-                  );
+                  // 加了个首页可以连接钱包的功能
+                  if (!web3Modal.cachedProvider) {
+                    loadWeb3Modal().then(()=>{
+                    // 如果不强刷，那么在调用loadWeb3Modal函数连接成功后，此时的 isInclaimList 值为false，所以mint按钮还是会显示出来。过一会儿后isInclaimList又变为了 true，mint又给隐藏了。
+                    // 所以显示了mint按钮，但是用户点击后发现没效果，后面又自动隐藏了，体验不好。而之前他们写的逻辑不敢乱动，所以进行强制刷新。这个问题一直存在，之前的逻辑不敢动，故仅在此处处理了以下。
+                    window.location.reload();
+                    })
+                  } else {
+                    tx(
+                      writeContracts.DappLearningCollectible.mintItem(
+                        window.crypto.getRandomValues(new Uint32Array(1))[0],
+                        getProof(address),
+                      ),
+                    );
+                  }
                 }}
               >
                 {web3Modal.cachedProvider
