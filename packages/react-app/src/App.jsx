@@ -4,7 +4,7 @@ import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./App.css";
-import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty, message } from "antd";
+import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Image, notification } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
@@ -35,10 +35,10 @@ import { useQuery } from "@apollo/client";
 import getProof from "./utils/getMerkleTree";
 import { dappLearningCollectibles, getCurrentColl } from "./gql";
 import { Loading, useLoading } from "./components/Loading";
-import { NFTImage } from "./components/Image";
 import { NoData } from "./components/NoData";
 import { Header, NavBar } from "./components/Header";
 import { Transfer } from "./pages/transfer";
+import { YourCollectibles } from "./pages/collectibles";
 
 const { BufferList } = require("bl");
 // https://www.npmjs.com/package/ipfs-http-client
@@ -218,16 +218,29 @@ function App(props) {
   // console.log("localChainId=====", localChainId);
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
-      message.warn(
-        `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${
-          targetNetwork?.name
-        } Network`,
-      );
+      notification.warning({
+        message: 'Network Error',
+        duration: null,
+        description: `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${targetNetwork?.name} Network`,
+        top: 60
+      });
       setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
     } else {
       setNetwork(targetNetwork?.name);
     }
   }, [localChainId, selectedChainId, targetNetwork]);
+
+  useEffect(() => {
+    if (!web3Modal?.cachedProvider && targetNetwork?.name) {
+      notification.warning({
+        message: 'The Network is not connected',
+        duration: 3,
+        description: `The Network is not connected, Please connect to ${targetNetwork?.name} Network`,
+        top: 60
+      });
+      return
+    }
+  }, [targetNetwork, web3Modal?.cachedProvider]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -426,7 +439,7 @@ function App(props) {
                   block
                   type="primary"
                   onClick={() => approveWETH()}
-                  // disabled={address * 1 !== owner * 1}
+                // disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
                   Approve my WETH
@@ -534,7 +547,10 @@ function App(props) {
 
       list.push(
         <div key={name} className={"cardBox"}>
-          <NFTImage image={image} />
+          <Image
+            preview={{ mask: null }}
+            src={image}
+          />
           <div
             style={{
               opacity: 0.77,
@@ -593,7 +609,7 @@ function App(props) {
     try {
       const auctionAddress = readContracts.AuctionFixedPrice.address;
       await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const approveWETH = async () => {
@@ -605,7 +621,7 @@ function App(props) {
       // if (allowance.lt(price)) {
 
       // }
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const completeAuction = async (tokenId, price) => {
@@ -725,89 +741,24 @@ function App(props) {
         <Switch>
           {/* yourcollectibles */}
           <Route exact path="/">
-            <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
-              {isInclaimList !== undefined && !isInclaimList && (
-                <Button
-                  block
-                  disabled={address && getProof(address).length === 0}
-                  onClick={() => {
-                    // console.log("gasPrice,", gasPrice);
-                    // console.log(ethers.BigNumber.from(window.crypto.getRandomValues(new Uint32Array(1))[0]));
-                    // console.log("mintItem=======", id);
-                    // console.log(address, getProof(address));
-                    tx(
-                      writeContracts.DappLearningCollectible.mintItem(
-                        window.crypto.getRandomValues(new Uint32Array(1))[0],
-                        getProof(address),
-                      ),
-                    );
-                  }}
-                >
-                  {web3Modal.cachedProvider
-                    ? getProof(address).length === 0
-                      ? "No permission to mint"
-                      : "Mint"
-                    : "Please connect Wallet"}
-                </Button>
-              )}
-              <List
-                bordered
-                // dataSource={yourCollectibles}
-                dataSource={currentColl?.data?.dappLearningCollectibles}
-                renderItem={item => {
-                  if (!id_rank[item.tokenId]) return;
-                  item = { ...item, ...assets[assetKeys[id_rank[item.tokenId]]] };
-                  // const id = item.id.toNumber();
-                  const id = id_rank[item.tokenId] * 1;
-                  return (
-                    <List.Item key={id + "_" + item.uri + "_" + item.owner}>
-                      <Card
-                        title={
-                          <div>
-                            <span style={{ fontSize: 16, marginRight: 8 }}>#{id}</span> {item.name}
-                          </div>
-                        }
-                      >
-                        <div>
-                          <img src={item.image} style={{ maxWidth: 150 }} />
-                        </div>
-                        <div>{item.description}</div>
-                      </Card>
-
-                      <div>
-                        owner:{" "}
-                        <Address
-                          address={item.owner}
-                          ensProvider={mainnetProvider}
-                          blockExplorer={blockExplorer}
-                          fontSize={16}
-                        />
-                        <AddressInput
-                          ensProvider={mainnetProvider}
-                          placeholder="transfer to address"
-                          value={transferToAddresses[id]}
-                          onChange={newValue => {
-                            let update = {};
-                            update[id] = newValue;
-                            setTransferToAddresses({ ...transferToAddresses, ...update });
-                          }}
-                        />
-                        <Button
-                          onClick={() => {
-                            console.log("writeContracts", writeContracts);
-                            tx(
-                              writeContracts.DappLearningCollectible.transferFrom(address, transferToAddresses[id], id),
-                            );
-                          }}
-                        >
-                          Transfer
-                        </Button>
-                      </div>
-                    </List.Item>
-                  );
-                }}
-              />
-            </div>
+            <YourCollectibles
+              mainnetProvider={mainnetProvider}
+              isInclaimList={isInclaimList}
+              assets={assets}
+              assetKeys={assetKeys}
+              id_rank={id_rank}
+              blockExplorer={blockExplorer}
+              writeContracts={writeContracts}
+              web3Modal={web3Modal}
+              currentColl={currentColl}
+              transferToAddresses={transferToAddresses}
+              address={address}
+              setTransferToAddresses={setTransferToAddresses}
+              getProof={getProof}
+              tx={tx}
+              loadWeb3Modal={loadWeb3Modal}
+              nftAddress={readContracts?.DappLearningCollectible?.address}
+            />
           </Route>
 
           {/* gallery */}
