@@ -4,7 +4,7 @@ import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./App.css";
-import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty, message } from "antd";
+import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Empty, notification } from "antd";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useUserAddress } from "eth-hooks";
@@ -39,6 +39,7 @@ import { NFTImage } from "./components/Image";
 import { NoData } from "./components/NoData";
 import { Header, NavBar } from "./components/Header";
 import { Transfer } from "./pages/transfer";
+import { YourCollectibles } from "./pages/collectibles";
 
 const { BufferList } = require("bl");
 // https://www.npmjs.com/package/ipfs-http-client
@@ -222,16 +223,29 @@ function App(props) {
   // console.log("localChainId=====", localChainId);
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
-      message.warn(
-        `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${
-          targetNetwork?.name
-        } Network`,
-      );
+      notification.warning({
+        message: 'Network Error',
+        duration: null,
+        description: `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${targetNetwork?.name} Network`,
+        top: 60
+      });
       setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
     } else {
       setNetwork(targetNetwork?.name);
     }
   }, [localChainId, selectedChainId, targetNetwork]);
+
+  useEffect(() => {
+    if (!web3Modal?.cachedProvider && targetNetwork?.name) {
+      notification.warning({
+        message: 'The Network is not connected',
+        duration: 3,
+        description: `The Network is not connected, Please connect to ${targetNetwork?.name} Network`,
+        top: 60
+      });
+      return
+    }
+  }, [targetNetwork, web3Modal?.cachedProvider]);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -430,7 +444,7 @@ function App(props) {
                   block
                   type="primary"
                   onClick={() => approveWETH()}
-                  // disabled={address * 1 !== owner * 1}
+                // disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
                   Approve my WETH
@@ -597,7 +611,7 @@ function App(props) {
     try {
       const auctionAddress = readContracts.AuctionFixedPrice.address;
       await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const approveWETH = async () => {
@@ -609,7 +623,7 @@ function App(props) {
       // if (allowance.lt(price)) {
 
       // }
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const completeAuction = async (tokenId, price) => {
@@ -729,7 +743,24 @@ function App(props) {
         <Switch>
           {/* yourcollectibles */}
           <Route exact path="/">
-            <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+            <YourCollectibles
+              mainnetProvider={mainnetProvider}
+              isInclaimList={isInclaimList}
+              assets={assets}
+              assetKeys={assetKeys}
+              id_rank={id_rank}
+              blockExplorer={blockExplorer}
+              writeContracts={writeContracts}
+              web3Modal={web3Modal}
+              currentColl={currentColl}
+              transferToAddresses={transferToAddresses}
+              address={address}
+              setTransferToAddresses={setTransferToAddresses}
+              getProof={getProof}
+              tx={tx}
+              nftAddress={readContracts?.DappLearningCollectible?.address}
+            />
+            {/* <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
               {isInclaimList !== undefined && !isInclaimList && (
                 <Button
                   block
@@ -812,7 +843,7 @@ function App(props) {
                 }}
               />
             </div>
-          </Route>
+           */}</Route>
 
           {/* gallery */}
           <Route exact path="/gallery">

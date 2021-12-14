@@ -3,14 +3,12 @@ import { Address } from "../../components";
 import { activeColor, bgColor, mainWidth } from "../../theme";
 import StackGrid from "react-stack-grid";
 import { SearchQuery } from "./SearchQuery"
-import { useLoading } from "../../components/Loading";
 import { NoData } from "../../components/NoData";
 import { Image } from "antd";
 import errorImage from "./errorImge.jpg"
 import { LoadingCore } from "../../components/Loading"
 
 export const Transfer = (props) => {
-  const { loading } = useLoading();
   const { mainnetProvider, transferEvents, loadedAssets, blockExplorer, nftAddress } = props
   const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
   const assets = useMemo(() => {
@@ -38,7 +36,7 @@ export const Transfer = (props) => {
               className="cardBox"
               style={{
                 background: bgColor,
-                boxShadow: "10px 10px 10px rgba(0,0,0,0.7)",
+                boxShadow: "10px 10px 10px rgba(0,0,0,0.5)",
                 width: 250,
                 height: 275,
                 minHeight: 275,
@@ -52,7 +50,7 @@ export const Transfer = (props) => {
                 height={186}
                 key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}
                 preview={{ mask: null }}
-                src={assets ? assets[parseInt(item.tokenId["_hex"])]?.image : "http"}
+                src={assets ? assets[parseInt(item.tokenId["_hex"])]?.image : errorImage}
                 placeholder={
                   <div style={{
                     width: "100%",
@@ -67,7 +65,6 @@ export const Transfer = (props) => {
                     </div>
                   </div>
                 }
-                fallback={errorImage}
               />
               <a
                 style={{
@@ -102,9 +99,7 @@ export const Transfer = (props) => {
             </div>
           );
         })}
-      </StackGrid> : !loading ? (
-        <NoData style={{ marginTop: 28 }} />
-      ) : null}
+      </StackGrid> : <NoData style={{ marginTop: 28 }} />}
     </div>
   )
 }

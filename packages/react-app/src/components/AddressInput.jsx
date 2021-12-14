@@ -123,6 +123,7 @@ export default function AddressInput(props) {
         name={"0xAddress"}//name it something other than address for auto fill doxxing
         autoComplete="off"
         autoFocus={props.autoFocus}
+        allowClear
         placeholder={props.placeholder ? props.placeholder : "address"}
         prefix={<Blockie address={currentValue} size={8} scale={3} />}
         value={ens || currentValue}
