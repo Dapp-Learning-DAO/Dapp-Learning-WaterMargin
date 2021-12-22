@@ -18,7 +18,9 @@
     "postdeploy": "yarn workspace hardhat postdeploy",
     "graph-codegen": "yarn workspace dapp-learning-test codegen",
     "graph-build": "yarn workspace dapp-learning-test build",
-    "graph-deploy": "yarn workspace dapp-learning-test deploy"
+    "graph-deploy": "yarn workspace dapp-learning-test deploy",
+    "graph-create-local": "yarn workspace dapp-learning-test create-local",
+    "graph-deploy-local": "yarn workspace dapp-learning-test deploy-local"
   },
   "workspaces": {
     "packages": [
