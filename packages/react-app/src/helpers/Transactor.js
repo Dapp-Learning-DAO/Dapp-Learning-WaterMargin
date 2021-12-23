@@ -79,6 +79,7 @@ export default function Transactor(provider, gasPrice, etherscan) {
           message: "Transaction Error",
           description: e.message,
         });
+        return Promise.reject("Transaction Error:" + e.message)
       }
     };
   }
