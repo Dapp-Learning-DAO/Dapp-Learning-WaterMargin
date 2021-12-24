@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import { PrinterOutlined, FlagOutlined } from "@ant-design/icons";
-import "antd/dist/antd.css";
+// import "antd/dist/antd.css";
+// import "./global.less";
 import "./App.css";
 import { Row, Col, Button, Alert, List, Card, Modal, InputNumber, Image, notification } from "antd";
 import Web3Modal from "web3modal";
@@ -219,10 +220,12 @@ function App(props) {
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
       notification.warning({
-        message: 'Network Error',
+        message: "Network Error",
         duration: null,
-        description: `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"} Network, you should choose ${targetNetwork?.name} Network`,
-        top: 60
+        description: `You are selected to choose ${
+          NETWORK(selectedChainId)?.name || "Unknown"
+        } Network, you should choose ${targetNetwork?.name} Network`,
+        top: 60,
       });
       setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
     } else {
@@ -233,12 +236,12 @@ function App(props) {
   useEffect(() => {
     if (!web3Modal?.cachedProvider && targetNetwork?.name) {
       notification.warning({
-        message: 'The Network is not connected',
+        message: "The Network is not connected",
         duration: 3,
         description: `The Network is not connected, Please connect to ${targetNetwork?.name} Network`,
-        top: 60
+        top: 60,
       });
-      return
+      return;
     }
   }, [targetNetwork, web3Modal?.cachedProvider]);
 
@@ -399,9 +402,19 @@ function App(props) {
     let new_auc_arr = [...auctionArr];
     let new_cancel_arr = [...cancelArr];
     for (let a in loadedAssets ? loadedAssets.slice(0, 6) : []) {
-      let { auctionInfo, owner, id, forSale, name, external_url, rank, image, description, isAuction, isWanting } = loadedAssets[
-        a
-      ];
+      let {
+        auctionInfo,
+        owner,
+        id,
+        forSale,
+        name,
+        external_url,
+        rank,
+        image,
+        description,
+        isAuction,
+        isWanting,
+      } = loadedAssets[a];
 
       if (isAuction && auctionArr.includes(id)) {
         new_auc_arr = new_auc_arr.filter(e => e !== id);
@@ -439,7 +452,7 @@ function App(props) {
                   block
                   type="primary"
                   onClick={() => approveWETH()}
-                // disabled={address * 1 !== owner * 1}
+                  // disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
                   Approve my WETH
@@ -463,7 +476,14 @@ function App(props) {
             )}
             {/* isActive && address === seller */}
             {isAuction && !isEnded && weth_balance >= price && (
-              <Button style={btnStyle} block ghost type="primary" disabled={isWanting} onClick={() => completeAuction(id, price)}>
+              <Button
+                style={btnStyle}
+                block
+                ghost
+                type="primary"
+                disabled={isWanting}
+                onClick={() => completeAuction(id, price)}
+              >
                 I want this
               </Button>
             )}
@@ -547,10 +567,7 @@ function App(props) {
 
       list.push(
         <div key={name} className={"cardBox"}>
-          <Image
-            preview={{ mask: null }}
-            src={image}
-          />
+          <Image preview={{ mask: null }} src={image} />
           <div
             style={{
               opacity: 0.77,
@@ -609,7 +626,7 @@ function App(props) {
     try {
       const auctionAddress = readContracts.AuctionFixedPrice.address;
       await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const approveWETH = async () => {
@@ -621,7 +638,7 @@ function App(props) {
       // if (allowance.lt(price)) {
 
       // }
-    } catch (err) { }
+    } catch (err) {}
   };
 
   const completeAuction = async (tokenId, price) => {
@@ -636,18 +653,18 @@ function App(props) {
     //   return;
     // }
     const nftAddress = readContracts.DappLearningCollectible.address;
-    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 })
+    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 });
     // updateYourCollectibles();
     const _list = loadedAssets.map(item => {
       if (item.id === tokenId) {
         return {
           isWanting: true,
-          ...item
+          ...item,
         };
       }
       return item;
-    })
-    setLoadedAssets(_list.concat([]))
+    });
+    setLoadedAssets(_list.concat([]));
   };
 
   const cancelAuction = async tokenId => {
@@ -934,6 +951,13 @@ const logoutOfWeb3Modal = async () => {
 
 window.ethereum &&
   window.ethereum.on("chainChanged", chainId => {
+    setTimeout(() => {
+      window.location.reload();
+    }, 1);
+  });
+
+window.ethereum &&
+  window.ethereum.on("accountsChanged", accounts => {
     setTimeout(() => {
       window.location.reload();
     }, 1);
