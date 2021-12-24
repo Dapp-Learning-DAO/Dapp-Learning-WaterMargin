@@ -102,6 +102,7 @@ export const YourCollectibles = props => {
                           window.crypto.getRandomValues(new Uint32Array(1))[0],
                           getProof(address),
                         ),
+                        true,
                       );
                       setHadClick(true);
                     }

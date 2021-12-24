@@ -12,7 +12,7 @@ import Notify from "bnc-notify";
 export default function Transactor(provider, gasPrice, etherscan) {
   if (typeof provider !== "undefined") {
     // eslint-disable-next-line consistent-return
-    return async tx => {
+    return async (tx, catchable = false) => {
       const signer = provider.getSigner();
       const network = await provider.getNetwork();
       console.log("network", network);
@@ -79,7 +79,7 @@ export default function Transactor(provider, gasPrice, etherscan) {
           message: "Transaction Error",
           description: e.message,
         });
-        return Promise.reject("Transaction Error:" + e.message)
+        if (catchable) return Promise.reject("Transaction Error:" + e.message);
       }
     };
   }
