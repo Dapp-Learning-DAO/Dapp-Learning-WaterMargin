@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { Address, AddressInput } from "../../components";
 import { Modal, Button, Image, message, Tooltip } from "antd";
 import { activeColor, mainWidth, bgColor } from "../../theme";
@@ -52,14 +52,23 @@ export const YourCollectibles = props => {
     setIsModalVisible(false);
   };
 
-  useEffect(() => {
-    if (currentColl?.data?.dappLearningCollectibles?.length > 0) {
-      localStorage.setItem("isMint", "0")
+  // Determine whether there is a rank id value of the current user's asset in the id_rank
+  const isIdRankExits = useMemo(() => {
+    if (id_rank && JSON.stringify(id_rank) !== "{}" && currentColl?.data?.dappLearningCollectibles?.length > 0) {
+      return currentColl?.data?.dappLearningCollectibles?.some(item => id_rank[item.tokenId])
     }
-  }, [currentColl?.data?.dappLearningCollectibles?.length])
+    return false
+  }, [JSON.stringify(id_rank), currentColl?.data?.dappLearningCollectibles?.length])
+
+  useEffect(() => {
+    if (currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits && !loading) {
+      localStorage.setItem("isMint", "0")
+      setLoading(false)
+    }
+  }, [currentColl?.data?.dappLearningCollectibles?.length, isIdRankExits, loading])
 
   return (
-    <div style={{ width: "100%", paddingBottom: 32 }}>
+    <div style={{ width: "100%", paddingBottom: address && web3Modal.cachedProvider ? 32 : 0 }}>
       <div
         style={{
           height: "600px",
@@ -108,39 +117,31 @@ export const YourCollectibles = props => {
                         window.location.reload();
                       });
                     } else {
-                      await tx(
+                      const result = await tx(
                         writeContracts.DappLearningCollectible.mintItem(
                           window.crypto.getRandomValues(new Uint32Array(1))[0],
                           getProof(address),
                         ),
                         true,
                       );
-                      /* 
-                      .then((res) => {
-                      // res.wait There is a delay of a few seconds after the transaction is successful
-                      /* if (res && res.wait) {
-                        res.wait().then(() => {
-                          localStorage.setItem("isMint", '1');
-                          setLoading(true)
-                        })
-                      } * /
-                      // For the time being, only if the confirmation button is clicked, the transition animation is displayed
-                      if (res) {
+                      if (currentColl?.data?.dappLearningCollectibles?.length === 0) {
                         localStorage.setItem("isMint", '1');
                         setLoading(true)
-                        if (res.wait) {
-                          res.wait().then().catch(() => {
-                            // tx fail
-                            localStorage.setItem("isMint", '0');
-                            setLoading(false)
-                          })
-                        }
                       }
-                    }) */
                       setHadClick(true);
+                      result.wait().then(() => {
+                        console.log("The transaction was successful")
+                      }).catch(() => {
+                        // After the transaction fails, it will go here, but it will be delayed for a few seconds
+                        console.log("Transaction failed")
+                        localStorage.setItem("isMint", '0');
+                        setLoading(false)
+                        setHadClick(false);
+                      })
                     }
                   } catch (error) {
                     console.log(error);
+                    console.log("Cancel a transaction")
                   }
                 }}
               >
@@ -155,9 +156,9 @@ export const YourCollectibles = props => {
         </div>
       </div>
       <div style={{ width: mainWidth, margin: "auto", position: "relative" }}>
-        {currentColl?.data?.dappLearningCollectibles?.length > 0 && <p>All you have WaterMargin NFT</p>}
-        {currentColl?.data?.dappLearningCollectibles?.length > 0 ? (
-          <StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
+        {currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits && <p>All you have WaterMargin NFT</p>}
+        {currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits
+          ? (<StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
             {currentColl?.data?.dappLearningCollectibles?.map((item, index) => {
               if (!id_rank[item.tokenId]) return;
               item = { ...item, ...assets[assetKeys[id_rank[item.tokenId]]] };
@@ -272,11 +273,13 @@ export const YourCollectibles = props => {
                 </div>
               );
             })}
-          </StackGrid>
-        )
-          : (isShowLoading
-            ? (loading ? null : <LoadingNFT />)
-            : <NoData description={"You don't have any WaterMargin NFT!"} />)}
+          </StackGrid>)
+          : (address && web3Modal.cachedProvider
+            ? (isShowLoading
+              ? (loading ? null : <LoadingNFT />)
+              : <NoData description={"You don't have any WaterMargin NFT!"} />)
+            : null)
+        }
         <Modal
           title="Transfer WaterMargin NFT"
           okText={"Transfer"}
