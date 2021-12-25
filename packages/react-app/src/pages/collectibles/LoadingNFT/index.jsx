@@ -1,5 +1,6 @@
 import React from "react";
 import "./index.css"
+import panlaoshi from "./pan.gif"
 
 export const LoadingNFT = (props) => {
   return (
@@ -8,5 +9,13 @@ export const LoadingNFT = (props) => {
       <div className="object" id="second_object"></div>
       <div className="object" id="third_object"></div>
       <div style={{ position: "absolute", bottom: -20, left: 5 }}>WaterMargin NFT loading...</div>
+    </div>)
+}
+
+export const LoadingNFT1 = () => {
+  return (
+    <div style={{ margin: "20px auto" }}>
+      <img src={panlaoshi} style={{ borderRadius: 5 }} alt="" />
+      <div style={{ marginTop: -26, fontSize: 18, color: "white" }}>大朗，来把药喝了，你的NFT一会儿就好！</div>
     </div>)
 }
