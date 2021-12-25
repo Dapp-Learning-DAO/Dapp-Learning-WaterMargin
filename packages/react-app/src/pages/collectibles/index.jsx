@@ -1,11 +1,12 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { Address, AddressInput } from "../../components";
 import { Modal, Button, Image, message, Tooltip } from "antd";
 import { activeColor, mainWidth, bgColor } from "../../theme";
 import StackGrid from "react-stack-grid";
+import { LoadingNFT } from "./LoadingNFT"
 import errorImage from "../transfer/errorImge.jpg";
 import bgImage from "../../static/watermargin.png";
-import { LoadingCore } from "../../components/Loading";
+import { LoadingCore, useLoading } from "../../components/Loading";
 import { NoData } from "../../components/NoData";
 import styles from "./index.module.css";
 
@@ -31,7 +32,10 @@ export const YourCollectibles = props => {
 
   const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
   const [isModalVisible, setIsModalVisible] = useState(false);
+  //isShowLoading: Whether to display transition animations
+  const [isShowLoading, setLoading] = useState(localStorage.getItem("isMint") === "1");
   const [selectId, setSelectId] = useState();
+  const { loading } = useLoading()
   const [hadClick, setHadClick] = useState(false);
 
   const handleOk = useCallback(() => {
@@ -39,16 +43,32 @@ export const YourCollectibles = props => {
       message.warning("Please enter a well-formed address");
       return;
     }
-    tx(writeContracts.DappLearningCollectible.transferFrom(address, transferToAddresses[selectId], selectId));
-    setIsModalVisible(false);
+    tx(writeContracts.DappLearningCollectible.transferFrom(address, transferToAddresses[selectId], selectId)).then((res) => {
+      if (res) setIsModalVisible(false)
+    })
   }, [selectId, transferToAddresses, address, writeContracts]);
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
+  // Determine whether there is a rank id value of the current user's asset in the id_rank
+  const isIdRankExits = useMemo(() => {
+    if (id_rank && JSON.stringify(id_rank) !== "{}" && currentColl?.data?.dappLearningCollectibles?.length > 0) {
+      return currentColl?.data?.dappLearningCollectibles?.some(item => id_rank[item.tokenId])
+    }
+    return false
+  }, [JSON.stringify(id_rank), currentColl?.data?.dappLearningCollectibles?.length])
+
+  useEffect(() => {
+    if (currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits && !loading) {
+      localStorage.setItem("isMint", "0")
+      setLoading(false)
+    }
+  }, [currentColl?.data?.dappLearningCollectibles?.length, isIdRankExits, loading])
+
   return (
-    <div style={{ width: "100%", paddingBottom: 32 }}>
+    <div style={{ width: "100%", paddingBottom: address && web3Modal.cachedProvider ? 32 : 0 }}>
       <div
         style={{
           height: "600px",
@@ -88,26 +108,40 @@ export const YourCollectibles = props => {
                 type="primary"
                 disabled={(address && getProof(address).length === 0 && web3Modal.cachedProvider) || hadClick}
                 onClick={async () => {
-                  // 加了个首页可以连接钱包的功能
+                  // Added a home page to connect the function of the wallet
                   try {
                     if (!web3Modal.cachedProvider) {
                       loadWeb3Modal().then(() => {
-                        // 如果不强刷，那么在调用loadWeb3Modal函数连接成功后，此时的 isInclaimList 值为false，所以mint按钮还是会显示出来。过一会儿后isInclaimList又变为了 true，mint又给隐藏了。
-                        // 所以显示了mint按钮，但是用户点击后发现没效果，后面又自动隐藏了，体验不好。而之前他们写的逻辑不敢乱动，所以进行强制刷新。这个问题一直存在，之前的逻辑不敢动，故仅在此处处理了以下。
+                        // If you do not force the brush, then after the loadWeb3Modal function is successfully connected, the isInclaimList value at this time is false, so the mint button will still be displayed. After a while isInclaimList became true again, and mint was hidden again.
+                        // So the mint button is displayed, but the user clicks and finds no effect, and then it is automatically hidden, and the experience is not good. The logic they wrote before did not dare to move, so it was forced to refresh. This problem has always existed, and the previous logic did not dare to move, so it only dealt with the following here.
                         window.location.reload();
                       });
                     } else {
-                      await tx(
+                      const result = await tx(
                         writeContracts.DappLearningCollectible.mintItem(
                           window.crypto.getRandomValues(new Uint32Array(1))[0],
                           getProof(address),
                         ),
                         true,
                       );
+                      if (currentColl?.data?.dappLearningCollectibles?.length === 0) {
+                        localStorage.setItem("isMint", '1');
+                        setLoading(true)
+                      }
                       setHadClick(true);
+                      result.wait().then(() => {
+                        console.log("The transaction was successful")
+                      }).catch(() => {
+                        // After the transaction fails, it will go here, but it will be delayed for a few seconds
+                        console.log("Transaction failed")
+                        localStorage.setItem("isMint", '0');
+                        setLoading(false)
+                        setHadClick(false);
+                      })
                     }
                   } catch (error) {
                     console.log(error);
+                    console.log("Cancel a transaction")
                   }
                 }}
               >
@@ -121,10 +155,10 @@ export const YourCollectibles = props => {
           </div>
         </div>
       </div>
-      <div style={{ width: mainWidth, margin: "auto" }}>
-        {currentColl?.data?.dappLearningCollectibles?.length > 0 && <p>All you have WaterMargin NFT</p>}
-        {currentColl?.data?.dappLearningCollectibles?.length > 0 ? (
-          <StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
+      <div style={{ width: mainWidth, margin: "auto", position: "relative" }}>
+        {currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits && <p>All you have WaterMargin NFT</p>}
+        {currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits
+          ? (<StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
             {currentColl?.data?.dappLearningCollectibles?.map((item, index) => {
               if (!id_rank[item.tokenId]) return;
               item = { ...item, ...assets[assetKeys[id_rank[item.tokenId]]] };
@@ -239,10 +273,13 @@ export const YourCollectibles = props => {
                 </div>
               );
             })}
-          </StackGrid>
-        ) : (
-          <NoData description={"You don't have any WaterMargin NFT!"} />
-        )}
+          </StackGrid>)
+          : (address && web3Modal.cachedProvider
+            ? (isShowLoading
+              ? (loading ? null : <LoadingNFT />)
+              : <NoData description={"You don't have any WaterMargin NFT!"} />)
+            : null)
+        }
         <Modal
           title="Transfer WaterMargin NFT"
           okText={"Transfer"}
