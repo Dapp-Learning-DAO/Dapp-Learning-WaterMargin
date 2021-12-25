@@ -34,8 +34,6 @@ const main = async () => {
   let merkleTree = new MerkleTree(addressList.map(token => hashToken(token)), keccak256, { sortPairs: true });
   await yourCollectible.setRoot(merkleTree.getHexRoot());
 
-  console.log("Merkle Root=======",merkleTree.getHexRoot());
-
   // Deploy contract AuctionFixedPrice
   const auctionFixed = await deploy("AuctionFixedPrice",[]) // <-- add in constructor args like line 19 vvvv
 
