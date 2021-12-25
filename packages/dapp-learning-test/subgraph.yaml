@@ -6,9 +6,9 @@ dataSources:
     name: DappLearningCollectible
     network: rinkeby
     source:
-      address: "0x128B3baEfFe46a83155D726eBdfc3C7BBA39d698"
+      address: "0xef27E99221A1CF96D5f39561C02f24bE655908E0"
       abi: DappLearningCollectible
-      startBlock: 9814250
+      startBlock: 9874096
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
