@@ -401,7 +401,7 @@ function App(props) {
     setGalleryList(null);
     let new_auc_arr = [...auctionArr];
     let new_cancel_arr = [...cancelArr];
-    for (let a in loadedAssets ? loadedAssets.slice(0, 6) : []) {
+    for (let a in loadedAssets ) {
       let {
         auctionInfo,
         owner,
