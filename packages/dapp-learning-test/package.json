@@ -6,7 +6,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ dapp-learning",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ dapp-learning-test",
     "create-local": "graph create DappLearningCollectible --node http://localhost:8020",
     "remove-local": "graph remove DappLearningCollectible --node http://localhost:8020",
     "deploy-local": "graph deploy DappLearningCollectible --ipfs http://localhost:5001 --node http://localhost:8020"

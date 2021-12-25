@@ -6,7 +6,6 @@ const { utils } = require("ethers");
 const R = require("ramda");
 require('dotenv').config();
 const ipfsAPI = require('ipfs-http-client');
-console.log(process.env.PROJECT_ID);
 const auth ='Basic ' + Buffer.from(process.env.PROJECT_ID + ':' + process.env.PROJECT_SECRET).toString('base64')
 const ipfs = ipfsAPI({host: 'ipfs.infura.io', port: '5001', protocol: 'https',headers: {
   authorization: auth
