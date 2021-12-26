@@ -40,6 +40,8 @@ import { NoData } from "./components/NoData";
 import { Header, NavBar } from "./components/Header";
 import { Transfer } from "./pages/transfer";
 import { YourCollectibles } from "./pages/collectibles";
+import { NETWROK_TYPE } from "./utils/networkType";
+require('dotenv').config();
 
 const { BufferList } = require("bl");
 // https://www.npmjs.com/package/ipfs-http-client
@@ -70,7 +72,7 @@ console.log("proof", getProof("0x70997970C51812dc3A010C7d01b50e0d17dc79C8"));
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS["matic"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS[NETWROK_TYPE]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = false;
@@ -114,7 +116,7 @@ if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
 // attempt to connect to our own scaffold eth rpc and if that fails fall back to infura...
-const mainnetInfura = new JsonRpcProvider("http://polygon-rpc.com/");
+const mainnetInfura = new JsonRpcProvider(process.env.REACT_APP_PROVIDER);
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I
 
 // 🏠 Your local provider is usually pointed at your local blockchain
