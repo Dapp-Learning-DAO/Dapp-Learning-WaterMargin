@@ -70,7 +70,7 @@ console.log("proof", getProof("0x70997970C51812dc3A010C7d01b50e0d17dc79C8"));
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS["rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS["matic"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = false;
@@ -114,7 +114,7 @@ if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
 // attempt to connect to our own scaffold eth rpc and if that fails fall back to infura...
-const mainnetInfura = new JsonRpcProvider("https://rinkeby.infura.io/v3/" + INFURA_ID);
+const mainnetInfura = new JsonRpcProvider("http://polygon-rpc.com/");
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I
 
 // 🏠 Your local provider is usually pointed at your local blockchain
@@ -215,8 +215,6 @@ function App(props) {
   */
 
   const [networkDisplay, setNetwork] = useState("");
-  // console.log("selectedChainId=====", selectedChainId);
-  // console.log("localChainId=====", localChainId);
   useEffect(() => {
     if (localChainId && selectedChainId && localChainId != selectedChainId) {
       notification.warning({
