@@ -33,10 +33,16 @@ export const YourCollectibles = props => {
   const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
   const [isModalVisible, setIsModalVisible] = useState(false);
   //isShowLoading: Whether to display transition animations
-  const [isShowLoading, setLoading] = useState(localStorage.getItem("isMint") === "1");
+  const [isShowLoading, setLoading] = useState();
   const [selectId, setSelectId] = useState();
   const { loading } = useLoading()
   const [hadClick, setHadClick] = useState(false);
+
+  useEffect(() => {
+    if (address) {
+      setLoading(localStorage.getItem(`mint-${address}`) === "1")
+    }
+  }, [address])
 
   const handleOk = useCallback(() => {
     if (transferToAddresses[selectId]?.length !== 42 || transferToAddresses[selectId]?.indexOf("0x") !== 0) {
@@ -45,6 +51,9 @@ export const YourCollectibles = props => {
     }
     tx(writeContracts.DappLearningCollectible.transferFrom(address, transferToAddresses[selectId], selectId)).then((res) => {
       if (res) setIsModalVisible(false)
+      res.wait().then(() => {
+        localStorage.setItem(`mint-${address}`, '0');
+      })
     })
   }, [selectId, transferToAddresses, address, writeContracts]);
 
@@ -62,7 +71,7 @@ export const YourCollectibles = props => {
 
   useEffect(() => {
     if (currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits && !loading) {
-      localStorage.setItem("isMint", "0")
+      localStorage.setItem(`mint-${address}`, "0")
       setLoading(false)
     }
   }, [currentColl?.data?.dappLearningCollectibles?.length, isIdRankExits, loading])
@@ -125,7 +134,7 @@ export const YourCollectibles = props => {
                         true,
                       );
                       if (currentColl?.data?.dappLearningCollectibles?.length === 0) {
-                        localStorage.setItem("isMint", '1');
+                        localStorage.setItem(`mint-${address}`, '1');
                         setLoading(true)
                       }
                       setHadClick(true);
@@ -134,7 +143,7 @@ export const YourCollectibles = props => {
                       }).catch(() => {
                         // After the transaction fails, it will go here, but it will be delayed for a few seconds
                         console.log("Transaction failed")
-                        localStorage.setItem("isMint", '0');
+                        localStorage.setItem(`mint-${address}`, '0');
                         setLoading(false)
                         setHadClick(false);
                       })
