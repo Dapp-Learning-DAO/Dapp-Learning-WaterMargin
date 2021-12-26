@@ -17,12 +17,6 @@ cp .env.example .env
 PRIVATE_KEY=xxxxxxxxxxxxxxxx
 PROJECT_ID=yyyy
 PROJECT_SECRET=ZZZZ
-
-
-## rinkeby WETH : 0xc778417e063141139fce010982780140aa0cd5ab
-## Matic: 0x7ceb23fd6bc0add59e62ac25578270cff1b9f619
-## 设置 WETH 地址，用于拍卖使用, 默认是配置为 rinkeby 的 WETH 地址，当合约部署到其他网络的时候，需要对应的修改这个值
-WETH_ADDRESS=0xc778417e063141139fce010982780140aa0cd5ab
 ```
 
 - 上传图片到 IPFS 
@@ -37,7 +31,7 @@ yarn upload
 
 - 部署合约  
 目前主合约为 DappLearningCollectible, 拍卖合约使用 AuctionFixedPrice.  
-执行部署命令后, 合约自动部署在 rinkeby 测试网路上, 并发布 ABI 到 react-app/src/contracts 下面. 如果需要部署到其他的测试网路, 需要需改 hardhat/hardhat.config.js 中的 defaultNetwork.  packages/hardhat/test/MerkleDrop.test.js 为 Merkle 空投的测试脚本
+执行部署命令后, 合约自动部署在 matic 测试网路上, 并发布 ABI 到 react-app/src/contracts 下面. 如果需要部署到其他的测试网路, 需要需改 hardhat/hardhat.config.js 中的 defaultNetwork.  packages/hardhat/test/MerkleDrop.test.js 为 Merkle 空投的测试脚本
 ```shell
 cd Dapp-Learning-WaterMargin
 yarn deploy 

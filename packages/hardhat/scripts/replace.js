@@ -14,6 +14,9 @@ const main = async () => {
   var addressList = fs.readFileSync(__dirname + '/addressList.json');
   fs.writeFileSync(__dirname + '/../../react-app/src/utils/addressList.json', addressList);
 
+  let netwrokType = 'export const NETWROK_TYPE = "' + network.name + '";';
+  fs.writeFileSync(__dirname + '/../../react-app/src/utils/networkType.js', netwrokType);
+
 };
 
 
