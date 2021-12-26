@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: DappLearningCollectible
-    network: rinkeby
+    network: matic
     source:
-      address: "0xef27E99221A1CF96D5f39561C02f24bE655908E0"
+      address: "0x2eb3F8280A658f7b36D4634b25225cd0B7e53904"
       abi: DappLearningCollectible
-      startBlock: 9874096
+      startBlock: 22969333
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
