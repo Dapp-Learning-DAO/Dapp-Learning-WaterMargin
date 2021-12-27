@@ -33,16 +33,16 @@ export const YourCollectibles = props => {
   const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
   const [isModalVisible, setIsModalVisible] = useState(false);
   //isShowLoading: Whether to display transition animations
-  const [isShowLoading, setLoading] = useState();
+  // const [isShowLoading, setLoading] = useState();
   const [selectId, setSelectId] = useState();
-  const { loading } = useLoading()
+  //const { loading } = useLoading()
   const [hadClick, setHadClick] = useState(false);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (address) {
       setLoading(localStorage.getItem(`mint-${address}`) === "1")
     }
-  }, [address])
+  }, [address]) */
 
   const handleOk = useCallback(() => {
     if (transferToAddresses[selectId]?.length !== 42 || transferToAddresses[selectId]?.indexOf("0x") !== 0) {
@@ -51,9 +51,9 @@ export const YourCollectibles = props => {
     }
     tx(writeContracts.DappLearningCollectible.transferFrom(address, transferToAddresses[selectId], selectId)).then((res) => {
       if (res) setIsModalVisible(false)
-      res.wait().then(() => {
+      /* res.wait().then(() => {
         localStorage.setItem(`mint-${address}`, '0');
-      })
+      }) */
     })
   }, [selectId, transferToAddresses, address, writeContracts]);
 
@@ -69,12 +69,12 @@ export const YourCollectibles = props => {
     return false
   }, [JSON.stringify(id_rank), currentColl?.data?.dappLearningCollectibles?.length])
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (currentColl?.data?.dappLearningCollectibles?.length > 0 && isIdRankExits && !loading) {
       localStorage.setItem(`mint-${address}`, "0")
       setLoading(false)
     }
-  }, [currentColl?.data?.dappLearningCollectibles?.length, isIdRankExits, loading])
+  }, [currentColl?.data?.dappLearningCollectibles?.length, isIdRankExits, loading]) */
 
   return (
     <div style={{ width: "100%", paddingBottom: address && web3Modal.cachedProvider ? 32 : 0 }}>
@@ -133,18 +133,18 @@ export const YourCollectibles = props => {
                         ),
                         true,
                       );
-                      if (currentColl?.data?.dappLearningCollectibles?.length === 0) {
+                      /* if (currentColl?.data?.dappLearningCollectibles?.length === 0) {
                         localStorage.setItem(`mint-${address}`, '1');
                         setLoading(true)
-                      }
+                      } */
                       setHadClick(true);
                       result.wait().then(() => {
                         console.log("The transaction was successful")
                       }).catch(() => {
                         // After the transaction fails, it will go here, but it will be delayed for a few seconds
                         console.log("Transaction failed")
-                        localStorage.setItem(`mint-${address}`, '0');
-                        setLoading(false)
+                        //localStorage.setItem(`mint-${address}`, '0');
+                        //setLoading(false)
                         setHadClick(false);
                       })
                     }
@@ -283,11 +283,12 @@ export const YourCollectibles = props => {
               );
             })}
           </StackGrid>)
-          : (address && web3Modal.cachedProvider
+          : <LoadingNFT />
+          /*  (address && web3Modal.cachedProvider
             ? (isShowLoading
               ? (loading ? null : <LoadingNFT />)
               : <NoData description={"You don't have any WaterMargin NFT!"} />)
-            : null)
+            : null) */
         }
         <Modal
           title="Transfer WaterMargin NFT"
