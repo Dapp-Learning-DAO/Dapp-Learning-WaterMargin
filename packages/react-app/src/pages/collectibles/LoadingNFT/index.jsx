@@ -2,7 +2,7 @@ import React from "react";
 import "./index.css"
 import panlaoshi from "./pan.gif"
 
-export const LoadingNFT = (props) => {
+export const LoadingNFT1 = (props) => {
   return (
     <div id="loading-nft-center-absolute" {...props}>
       <div className="object" id="first_object"></div>
@@ -12,10 +12,10 @@ export const LoadingNFT = (props) => {
     </div>)
 }
 
-export const LoadingNFT1 = () => {
+export const LoadingNFT = () => {
   return (
     <div style={{ margin: "20px auto" }}>
       <img src={panlaoshi} style={{ borderRadius: 5 }} alt="" />
-      <div style={{ marginTop: -26, fontSize: 18, color: "white" }}>大朗，来把药喝了，你的NFT一会儿就好！</div>
+      <div style={{ marginTop: -26, fontSize: 16, color: "white" }}>大朗，来把药喝了，你的NFT一会儿就好！</div>
     </div>)
 }
