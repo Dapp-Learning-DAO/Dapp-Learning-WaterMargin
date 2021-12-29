@@ -131,7 +131,7 @@ const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 // 🔭 block explorer URL
 const blockExplorer = targetNetwork?.blockExplorer;
 
-const CoinUnit = "WETH";
+const CoinUnit = "WMATIC";
 
 function App(props) {
   const mainnetProvider = mainnetInfura;
