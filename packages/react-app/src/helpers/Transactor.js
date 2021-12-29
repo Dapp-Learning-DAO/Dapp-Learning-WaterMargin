@@ -64,7 +64,7 @@ export default function Transactor(provider, gasPrice, etherscan) {
             };
           });
         } else {
-          notification.info({
+          notification.warning({
             message: "Local Transaction Sent",
             description: result.hash,
             placement: "bottomRight",

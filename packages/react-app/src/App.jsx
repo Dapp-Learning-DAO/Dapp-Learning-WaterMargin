@@ -41,7 +41,9 @@ import { Header, NavBar } from "./components/Header";
 import { Transfer } from "./pages/transfer";
 import { YourCollectibles } from "./pages/collectibles";
 import { NETWROK_TYPE } from "./utils/networkType";
-require('dotenv').config();
+import { parseUnits } from "@ethersproject/units";
+
+require("dotenv").config();
 
 const { BufferList } = require("bl");
 // https://www.npmjs.com/package/ipfs-http-client
@@ -129,6 +131,8 @@ const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 // 🔭 block explorer URL
 const blockExplorer = targetNetwork?.blockExplorer;
 
+const CoinUnit = "WETH";
+
 function App(props) {
   const mainnetProvider = mainnetInfura;
   if (DEBUG) console.log("🌎 mainnetProvider", mainnetProvider);
@@ -138,7 +142,9 @@ function App(props) {
   // const price = useExchangePrice(targetNetwork, mainnetProvider);
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
-  const gasPrice = useGasPrice(targetNetwork, "fast");
+  // const gasPrice = useGasPrice(targetNetwork, "fast");
+  const gasPrice = parseUnits("30", "gwei");
+
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
   let address = useUserAddress(userProvider);
@@ -205,6 +211,8 @@ function App(props) {
   const [auctionToken, setAuctionToken] = useState("");
   const [auctionArr, setAuctionArr] = useState([]);
   const [cancelArr, setCancelArr] = useState([]);
+  const [purchaseArr, setPurchaseArr] = useState([]);
+
   //
   // 🧠 This effect will update yourCollectibles by polling when your balance changes
   //
@@ -401,7 +409,9 @@ function App(props) {
     setGalleryList(null);
     let new_auc_arr = [...auctionArr];
     let new_cancel_arr = [...cancelArr];
-    for (let a in loadedAssets ) {
+    let new_purchase_arr = [...purchaseArr];
+
+    for (let a in loadedAssets) {
       let {
         auctionInfo,
         owner,
@@ -422,6 +432,10 @@ function App(props) {
 
       if (!isAuction && cancelArr.includes(id)) {
         new_cancel_arr = new_cancel_arr.filter(e => e !== id);
+      }
+
+      if (!isAuction && purchaseArr.includes(id)) {
+        new_purchase_arr = new_purchase_arr.filter(e => e !== id);
       }
 
       let cardActions = [];
@@ -455,7 +469,7 @@ function App(props) {
                   // disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
-                  Approve my WETH
+                  Approve my {CoinUnit}
                 </Button>
               </>
             )}
@@ -481,8 +495,9 @@ function App(props) {
                 block
                 ghost
                 type="primary"
-                disabled={isWanting}
+                // disabled={isWanting}
                 onClick={() => completeAuction(id, price)}
+                loading={purchaseArr.includes(id)}
               >
                 I want this
               </Button>
@@ -494,6 +509,7 @@ function App(props) {
                   block
                   danger
                   type="text"
+                  disabled={purchaseArr.includes(id)}
                   onClick={() => cancelAuction(id)}
                   loading={cancelArr.includes(id)}
                 >
@@ -516,7 +532,7 @@ function App(props) {
               <span style={{ flex: 1 }}>{!isEnded ? `in progress` : "the auction has ended"}</span>
               <span>
                 price: <span style={{ color: "rgb(24, 144, 255)", fontSize: "16px" }}>{utils.formatEther(price)}</span>{" "}
-                WETH
+                {CoinUnit}
               </span>
             </div>
             <div style={{ marginBottom: 4, padding: "0 8px" }}>
@@ -604,6 +620,7 @@ function App(props) {
     setGalleryList([...list]);
     setAuctionArr(new_auc_arr);
     setCancelArr(new_cancel_arr);
+    setPurchaseArr(new_purchase_arr);
   }, [loadedAssets, address]);
 
   const startAuction = tokenUri => {
@@ -644,27 +661,36 @@ function App(props) {
   const completeAuction = async (tokenId, price) => {
     // const tokenId = await readContracts.YourCollectible.uriToTokenId(utils.id(tokenUri));
     // return console.log(price);
-
-    // check balance
-    // const balance = await readContracts.WETH.balanceOf(address);
-    // console.warn(balance.toString());
-    // if (balance < price) {
-    //   // TODO: alert not enough money
-    //   return;
-    // }
-    const nftAddress = readContracts.DappLearningCollectible.address;
-    await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), { gasPrice, gasLimit: 1000000 });
-    // updateYourCollectibles();
-    const _list = loadedAssets.map(item => {
-      if (item.id === tokenId) {
-        return {
-          isWanting: true,
-          ...item,
-        };
+    try {
+      // check balance
+      const balance = await readContracts.WETH.balanceOf(address);
+      console.warn(balance.toString());
+      if (balance < price) {
+        // TODO: alert not enough money
+        notification.warning({
+          message: "No enough money",
+          // description: result.hash,
+          placement: "bottomRight",
+        });
+        return;
       }
-      return item;
-    });
-    setLoadedAssets(_list.concat([]));
+      const nftAddress = readContracts.DappLearningCollectible.address;
+      await tx(writeContracts.AuctionFixedPrice.purchaseNFTToken(nftAddress, tokenId), true);
+      // updateYourCollectibles();
+      !purchaseArr.includes(tokenId) && setPurchaseArr([...purchaseArr, tokenId]);
+      const _list = loadedAssets.map(item => {
+        if (item.id === tokenId) {
+          return {
+            isWanting: true,
+            ...item,
+          };
+        }
+        return item;
+      });
+      setLoadedAssets(_list.concat([]));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const cancelAuction = async tokenId => {
@@ -705,6 +731,7 @@ function App(props) {
             gasPrice,
           },
         ),
+        true,
       );
       const auctionInfo = await readContracts.AuctionFixedPrice.getTokenAuctionDetails(nftAddress, tokenId);
       console.log("auctionInfo", { auctionInfo });
