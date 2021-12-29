@@ -73,7 +73,7 @@ module.exports = {
     },
     matic: {
       url: 'http://polygon-rpc.com/',
-      gasPrice: 30000000000,
+      gasPrice: 32000000000,
       accounts: [mnemonic()]
     },
   },
