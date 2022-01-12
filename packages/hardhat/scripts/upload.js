@@ -25,6 +25,9 @@ const main = async () => {
 
     console.log("   "+artwork[a].name+" ipfs:",uploaded.path)
     allAssets[uploaded.path] = artwork[a]
+
+
+    fs.writeFileSync("./scripts/json/" + a + ".json",JSON.stringify(artwork[a]))
   }
 
   console.log("\n Injecting assets into the frontend...")
