@@ -141,7 +141,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #efeeee;
+  background: #ffffff;
   transition: box-shadow .2s ease-out;
   position: relative;
   border-radius: 50%;
@@ -150,7 +150,6 @@
   margin-left: calc(50% - 25px);
   cursor: pointer;
   font-style: italic;
-  color: "#ffffff"
 }
 .openseaBtn:hover{
   box-shadow: 0 0 0 rgba(0,0,0,0.1),
