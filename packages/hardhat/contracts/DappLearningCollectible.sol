@@ -34,7 +34,7 @@ contract DappLearningCollectible is ERC721PresetMinterPauserAutoId{
   bool private MERKLEVALIDITY = true;
 
   bool private MINTLIMITED = true;
-  constructor() public ERC721PresetMinterPauserAutoId("Dapp-Learning", "DLDAO","http://81.69.8.95/WaterMarginImg/") {
+  constructor(string memory tokenURI) public ERC721PresetMinterPauserAutoId("Dapp-Learning", "DLDAO",tokenURI) {
     ADMIN = msg.sender;
   }
 
@@ -56,9 +56,6 @@ contract DappLearningCollectible is ERC721PresetMinterPauserAutoId{
     MINTLIMITED = _limited;
   }
 
-function setTokenURI(uint id, string memory url) public returns (uint256){
-  _setTokenURI(id, url);
-}
   function mintItem(uint seed, bytes32[] memory proof) public returns (uint256)
   {
     if(MINTLIMITED){
