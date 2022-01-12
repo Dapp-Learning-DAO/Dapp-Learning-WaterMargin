@@ -7,10 +7,10 @@ import { NoData } from "../../components/NoData";
 import { Image } from "antd";
 import errorImage from "./errorImge.jpg"
 import { LoadingCore } from "../../components/Loading"
+import { openseaLink } from "../../App.jsx"
 
 export const Transfer = (props) => {
   const { mainnetProvider, transferEvents, loadedAssets, blockExplorer, nftAddress } = props
-  const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
   const assets = useMemo(() => {
     if (!(Array.isArray(loadedAssets) && loadedAssets?.length)) return null
     const asset = {};
@@ -71,20 +71,20 @@ export const Transfer = (props) => {
                   fontSize: 20,
                   borderRadius: "50%",
                   background: "#FFFFFF",
-                  width: 40,
-                  height: 40,
+                  width: 44,
+                  height: 44,
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginTop: -20,
-                  marginLeft: 105,
+                  marginTop: -22,
+                  marginLeft: "calc(50% - 22px)",
                   cursor: "pointer",
                   fontStyle: "italic",
                   color: "rgba(0,0,0,0.7)",
                   zIndex: 100
                 }}
                 target="_blank"
-                href={blockExplorerLink(nftAddress, item[2].toNumber())}
+                href={openseaLink(nftAddress, item[2].toNumber())}
               >{item[2].toNumber()}</a>
               <div style={{
                 paddingLeft: 10,

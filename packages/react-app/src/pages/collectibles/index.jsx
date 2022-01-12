@@ -9,6 +9,7 @@ import bgImage from "../../static/watermargin.png";
 import { LoadingCore, useLoading } from "../../components/Loading";
 import { NoData } from "../../components/NoData";
 import styles from "./index.module.css";
+import { openseaLink } from "../../App.jsx"
 
 export const YourCollectibles = props => {
   const {
@@ -30,7 +31,6 @@ export const YourCollectibles = props => {
     loadWeb3Modal,
   } = props;
 
-  const blockExplorerLink = (contract, id) => `${blockExplorer || "https://etherscan.io/"}token/${contract}?a=${id}`;
   const [isModalVisible, setIsModalVisible] = useState(false);
   //isShowLoading: Whether to display transition animations
   // const [isShowLoading, setLoading] = useState();
@@ -215,20 +215,20 @@ export const YourCollectibles = props => {
                       fontSize: 20,
                       borderRadius: "50%",
                       background: "#FFFFFF",
-                      width: 40,
-                      height: 40,
+                      width: 44,
+                      height: 44,
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      marginTop: -20,
-                      marginLeft: 105,
+                      marginTop: -22,
+                      marginLeft: "calc(50% - 22px)",
                       cursor: "pointer",
                       fontStyle: "italic",
                       color: "rgba(0,0,0,0.7)",
                       zIndex: 100,
                     }}
                     target="_blank"
-                    href={blockExplorerLink(nftAddress, parseInt(item?.tokenId))}
+                    href={openseaLink(nftAddress, parseInt(item?.tokenId))}
                   >
                     {parseInt(item?.tokenId)}
                   </a>
