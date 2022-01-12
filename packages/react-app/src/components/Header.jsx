@@ -23,7 +23,7 @@ export const NavBar = () => {
       width: 500,
       position: "fixed",
       top: 20,
-      left: 300,
+      left: 400,
       zIndex: 1002
     }}>
       {nav?.map(item => {
@@ -59,7 +59,7 @@ export const Header = (props) => {
       <div style={{ fontSize: 24, fontWeight: "sold" }}>
         WaterMargin
         </div>
-      {/* <a href="https://dapp-learning.com" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(0,0,0,0.5)", marginLeft: 20 }}>by Dapp-Learning DAO</a> */}
+        <a href="https://dapp-learning.com" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(0,0,0,0.5)", marginLeft: 20 }}>by Dapp-Learning DAO</a>
     </div>
     {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
     <div style={{ position: "relative" }}>

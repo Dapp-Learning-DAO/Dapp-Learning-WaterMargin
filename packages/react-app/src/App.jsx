@@ -50,6 +50,8 @@ const { BufferList } = require("bl");
 const ipfsAPI = require("ipfs-http-client");
 const ipfs = ipfsAPI({ host: "ipfs.infura.io", port: "5001", protocol: "https" });
 
+export const openseaLink = (contract, id) => `https://opensea.io/assets/matic/${contract}/${id}`;
+
 console.log("📦 Assets: ", assets);
 
 console.log("proof", getProof("0x70997970C51812dc3A010C7d01b50e0d17dc79C8"));
@@ -584,6 +586,11 @@ function App(props) {
       list.push(
         <div key={name} className={"cardBox"}>
           <Image preview={{ mask: null }} src={image} />
+          <a className="openseaBtn" target="_blank"
+            href={openseaLink(readContracts?.DappLearningCollectible?.address, parseInt(id))}
+          >
+            {parseInt(id)}
+          </a>
           <div
             style={{
               opacity: 0.77,
