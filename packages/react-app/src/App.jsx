@@ -372,6 +372,7 @@ function App(props) {
             return readContracts.DappLearningCollectible.tokenURI(e.tokenId);
           }),
       );
+      res = res.map(e => e.match(/Json\/((\d)*)/)[1]);
       let new_obj = { ...id_rank };
       wait_arr.map((e, idx) => (new_obj[e] = res[idx]));
       wait_arr.length > 0 && setId_rank({ ...new_obj });
