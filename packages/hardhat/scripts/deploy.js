@@ -28,7 +28,7 @@ const main = async () => {
   console.log(" \n")
 
   // deploy the contract with all the artworks forSale
-  const yourCollectible = await deploy("DappLearningCollectible",["http://81.69.8.95/WaterMarginImg/"]) // <-- add in constructor args like line 19 vvvv
+  const yourCollectible = await deploy("DappLearningCollectible",["http://81.69.8.95/WaterMarginJson/"]) // <-- add in constructor args like line 19 vvvv
   
   // set MerkleRoot
   let merkleTree = new MerkleTree(addressList.map(token => hashToken(token)), keccak256, { sortPairs: true });
