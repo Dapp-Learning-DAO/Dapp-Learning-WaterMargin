@@ -2,8 +2,8 @@ pragma solidity 0.8.0;
 //SPDX-License-Identifier: MIT
 
 //import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "./ERC721PresetMinterPauserAutoId.sol";
+import "./extensions/Counters.sol";
 
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 //import "@openzeppelin/contracts/access/Ownable.sol";
@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 // GET LISTED ON OPENSEA: https://testnets.opensea.io/get-listed/step-two
 
-contract DappLearningCollectible is ERC721URIStorage{
+contract DappLearningCollectible is ERC721PresetMinterPauserAutoId{
 
   event Mint(address sender, uint256 tokenID, string URL);
 
@@ -34,7 +34,7 @@ contract DappLearningCollectible is ERC721URIStorage{
   bool private MERKLEVALIDITY = true;
 
   bool private MINTLIMITED = true;
-  constructor() public ERC721("Dapp-Learning", "DLDAO") {
+  constructor() public ERC721PresetMinterPauserAutoId("Dapp-Learning", "DLDAO","http://81.69.8.95/WaterMarginImg/") {
     ADMIN = msg.sender;
   }
 
@@ -56,6 +56,9 @@ contract DappLearningCollectible is ERC721URIStorage{
     MINTLIMITED = _limited;
   }
 
+function setTokenURI(uint id, string memory url) public returns (uint256){
+  _setTokenURI(id, url);
+}
   function mintItem(uint seed, bytes32[] memory proof) public returns (uint256)
   {
     if(MINTLIMITED){
@@ -75,7 +78,7 @@ contract DappLearningCollectible is ERC721URIStorage{
 
     uint random = rand(seed) % RANKLENGTH;
     uint256 rank = getFreeRank(random);
-
+//  http://ip/watermargin/1
     string memory url = uint2str(rank);
     _setTokenURI(id, url);
 
