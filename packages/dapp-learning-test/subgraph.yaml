@@ -6,9 +6,9 @@ dataSources:
     name: DappLearningCollectible
     network: matic
     source:
-      address: "0x0c7B1a94300590B20F0687AB992142E03695C379"
+      address: "0x57b41F3e7E29CaC73D4cdBdc36F3b5Ac17F25A7E"
       abi: DappLearningCollectible
-      startBlock: 23622213
+      startBlock: 24323588
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
