@@ -40,12 +40,16 @@ contract DappLearningCollectible is ERC721PresetMinterPauserAutoId{
 
 
   modifier onlyAdmin() {
-    require(ADMIN == msg.sender, 'only admin');
+    require(msg.sender == ADMIN, 'only admin');
     _;
   }
 
   function setRoot(bytes32 _merkleroot ) public onlyAdmin {
     root = _merkleroot;
+  }
+
+  function setAdmin(address _admin ) public onlyAdmin {
+    ADMIN = _admin;
   }
 
   function setMerkleValidaity(bool _validity ) public onlyAdmin {
@@ -58,15 +62,19 @@ contract DappLearningCollectible is ERC721PresetMinterPauserAutoId{
 
   function mintItem(uint seed, bytes32[] memory proof) public returns (uint256)
   {
-    if(MINTLIMITED){
-      require(!claimedBitMap[msg.sender], 'Already Minted');
+    if(msg.sender != ADMIN){ 
+
+      if(MINTLIMITED){
+        require(!claimedBitMap[msg.sender], 'Already Minted');
+      }
+      
+      if(MERKLEVALIDITY){
+      require(MerkleProof.verify(proof, root, _leaf(msg.sender)), 'MerkleDistributor: Invalid proof.');
+    }
+
     }
 
     require(RANKCOUNTER <= 108, 'Distribution is over');
-    
-    if(MERKLEVALIDITY){
-      require(MerkleProof.verify(proof, root, _leaf(msg.sender)), 'MerkleDistributor: Invalid proof.');
-    }
 
     _tokenIds.increment();
 
