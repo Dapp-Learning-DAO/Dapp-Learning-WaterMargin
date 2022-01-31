@@ -604,7 +604,7 @@ function App(props) {
             }}
           >
             <div style={{ position: "relative" }}>
-              <div style={{ position: "absolute", top: "-22px" }}>Rank {rank}:</div>
+              <div style={{ position: "absolute", top: "-22px" }}>Rank {parseInt(rank) + 1}:</div>
               <div>{description}</div>
             </div>
             {owner && (
