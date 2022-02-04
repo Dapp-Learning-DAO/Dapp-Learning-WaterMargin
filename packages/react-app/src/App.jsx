@@ -206,6 +206,7 @@ function App(props) {
 
   //📟 Listen for broadcast events
   const transferEvents = useEventListener(readContracts, "DappLearningCollectible", "Transfer", localProvider, 1);
+  let burArr = transferEvents.filter(e => e.to * 1 === 0x00);
   if (DEBUG) console.log("📟 Transfer events:", transferEvents);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -366,7 +367,7 @@ function App(props) {
       let wait_arr = [];
       let res = await Promise.all(
         data?.dappLearningCollectibles
-          ?.filter(e => !Object.keys(id_rank).includes(e.tokenId))
+          ?.filter(e => !Object.keys(id_rank).includes(e.tokenId) && !e.isBurn)
           .map(e => {
             wait_arr.push(e.tokenId);
             return readContracts.DappLearningCollectible.tokenURI(e.tokenId);
@@ -376,10 +377,12 @@ function App(props) {
       let new_obj = { ...id_rank };
       wait_arr.map((e, idx) => (new_obj[e] = res[idx]));
       wait_arr.length > 0 && setId_rank({ ...new_obj });
-      let ranked_res = data?.dappLearningCollectibles?.map((e, i) => ({
-        ...e,
-        rank: new_obj[e.tokenId],
-      }));
+      let ranked_res = data?.dappLearningCollectibles
+        ?.filter(e => !e.isBurn)
+        .map((e, i) => ({
+          ...e,
+          rank: new_obj[e.tokenId],
+        }));
       assetUpdate = await Promise.all(
         ranked_res.map((e, idx) => {
           const forSale = forSaleArr[idx];
@@ -587,7 +590,9 @@ function App(props) {
       list.push(
         <div key={name} className={"cardBox"}>
           <Image preview={{ mask: null }} src={image} />
-          <a className="openseaBtn" target="_blank"
+          <a
+            className="openseaBtn"
+            target="_blank"
             href={openseaLink(readContracts?.DappLearningCollectible?.address, parseInt(id))}
           >
             {parseInt(id)}
@@ -852,7 +857,7 @@ function App(props) {
 
           <Route path="/transfers">
             <Transfer
-              transferEvents={transferEvents}
+              transferEvents={transferEvents.filter(e => e.to * 1 !== 0x00 && !burArr.find(b => b.from === e.to))}
               loadedAssets={loadedAssets}
               mainnetProvider={mainnetProvider}
               nftAddress={readContracts?.DappLearningCollectible?.address}
