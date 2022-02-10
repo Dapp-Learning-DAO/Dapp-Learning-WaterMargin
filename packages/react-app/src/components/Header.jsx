@@ -8,6 +8,7 @@ const nav = [
   { label: "YourCollectibles", path: "/" },
   { label: "Gallery", path: "/gallery" },
   { label: "Transfers", path: "/transfers" },
+  { label: "RedPacket", path: "/redPacket" },
   /* { label: "IPFS Upload", path: "/ipfsup" }, */
   /* { label: "Debug Contracts", path: "/debugcontracts" }, */
 ]
