@@ -39,6 +39,7 @@ import { Loading, useLoading } from "./components/Loading";
 import { NoData } from "./components/NoData";
 import { Header, NavBar } from "./components/Header";
 import { Transfer } from "./pages/transfer";
+import { RedPacket } from "./pages/redPacket";
 import { YourCollectibles } from "./pages/collectibles";
 import { NETWROK_TYPE } from "./utils/networkType";
 import { parseUnits } from "@ethersproject/units";
@@ -233,9 +234,8 @@ function App(props) {
       notification.warning({
         message: "Network Error",
         duration: null,
-        description: `You are selected to choose ${
-          NETWORK(selectedChainId)?.name || "Unknown"
-        } Network, you should choose ${targetNetwork?.name} Network`,
+        description: `You are selected to choose ${NETWORK(selectedChainId)?.name || "Unknown"
+          } Network, you should choose ${targetNetwork?.name} Network`,
         top: 60,
       });
       setNetwork(NETWORK(selectedChainId)?.name || "Unknown");
@@ -472,7 +472,7 @@ function App(props) {
                   block
                   type="primary"
                   onClick={() => approveWETH()}
-                  // disabled={address * 1 !== owner * 1}
+                // disabled={address * 1 !== owner * 1}
                 >
                   <FlagOutlined />
                   Approve my {CoinUnit}
@@ -656,7 +656,7 @@ function App(props) {
     try {
       const auctionAddress = readContracts.AuctionFixedPrice.address;
       await writeContracts.DappLearningCollectible.setApprovalForAll(auctionAddress, true);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const approveWETH = async () => {
@@ -668,7 +668,7 @@ function App(props) {
       // if (allowance.lt(price)) {
 
       // }
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const completeAuction = async (tokenId, price) => {
@@ -862,6 +862,15 @@ function App(props) {
               mainnetProvider={mainnetProvider}
               nftAddress={readContracts?.DappLearningCollectible?.address}
               blockExplorer={blockExplorer}
+            />
+          </Route>
+
+          <Route path="/redPacket">
+            <RedPacket
+              mainnetProvider={mainnetProvider}
+              writeContracts={writeContracts}
+              address={address}
+              tx={tx}
             />
           </Route>
 
