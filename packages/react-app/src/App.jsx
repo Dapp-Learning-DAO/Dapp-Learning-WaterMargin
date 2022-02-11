@@ -870,6 +870,7 @@ function App(props) {
               mainnetProvider={mainnetProvider}
               writeContracts={writeContracts}
               address={address}
+              selectedChainId={selectedChainId}
               tx={tx}
             />
           </Route>
