@@ -30,7 +30,7 @@ export const NavBar = () => {
       {nav?.map(item => {
         return (<div
           key={item?.label}
-          style={{ color: pathname === item?.path ? activeColor : textColor, marginRight: 50, cursor: "pointer" }}
+          style={{ color: pathname === item?.path ? activeColor : textColor, marginRight: 30, cursor: "pointer" }}
           className="cursor-pointer hover:text-red-500"
           onClick={() => history.push(item?.path)}
         >{item?.label}</div>)

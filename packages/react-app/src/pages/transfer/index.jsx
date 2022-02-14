@@ -4,7 +4,7 @@ import { activeColor, bgColor, mainWidth } from "../../theme";
 import StackGrid from "react-stack-grid";
 import { SearchQuery } from "./SearchQuery"
 import { NoData } from "../../components/NoData";
-import { Image } from "antd";
+import { Image, Pagination } from "antd";
 import errorImage from "./errorImge.jpg"
 import { LoadingCore } from "../../components/Loading"
 import { openseaLink } from "../../App.jsx"
@@ -21,15 +21,17 @@ export const Transfer = (props) => {
   }, [loadedAssets?.length])
 
   const [data, setData] = useState(transferEvents)
+  const [pageNo, setPageNo] = useState(1)
+  const size = 12
 
   return (
     <div style={{ width: mainWidth, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "auto", width: 1060, textAlign: "left" }}>
         {data?.length > 0 ? <div> A total of {data?.length} records</div> : <div style={{ color: "transparent" }}> A total of {data?.length} records</div>}
-        {transferEvents?.length > 0 && <SearchQuery list={transferEvents} setData={setData} assets={assets} />}
+        {transferEvents?.length > 0 && <SearchQuery list={transferEvents} setData={setData} assets={assets} setPageNo={setPageNo}/>}
       </div>
-      {transferEvents?.length > 0 ? <StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
-        {data?.map(item => {
+      {transferEvents?.length > 0 ? <><StackGrid columnWidth={250} gutterWidth={20} gutterHeight={32} style={{ marginTop: 20 }}>
+        {data?.slice((pageNo - 1) * size, size * pageNo)?.map(item => {
           return (
             <div
               key={item[0] + "_" + item[1] + "_" + item.blockNumber + "_" + item[2].toNumber()}
@@ -99,7 +101,17 @@ export const Transfer = (props) => {
             </div>
           );
         })}
-      </StackGrid> : <NoData style={{ marginTop: 28 }} />}
+      </StackGrid>
+        <Pagination
+          style={{ marginTop: 50 }}
+          current={pageNo}
+          hideOnSinglePage
+          total={data?.length}
+          pageSize={size}
+          showSizeChanger={false}
+          onChange={(page) => setPageNo(page) }
+        />
+      </> : <NoData style={{ marginTop: 28 }} />}
     </div>
   )
 }
