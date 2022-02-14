@@ -9,6 +9,7 @@ import { MerkleTree } from "merkletreejs";
 import { format } from "date-fns"
 import { cloneDeep } from "lodash"
 import { useIsExpire } from "./GetIsExpire"
+import { useLoading } from "../../components/Loading";
 
 export const RedPacketItem = props => {
     const {
@@ -24,6 +25,7 @@ export const RedPacketItem = props => {
     } = props;
     const [isModalVisible, setIsModalVisible] = useState(false);
     const isExpire = useIsExpire(item?.expireTime)
+    const { closeLoading } = useLoading();
 
     useEffect(() => {
         if (isExpire && item?.id && !item?.expired && item?.address && writeContracts?.HappyRedPacket && writeContracts?.HappyRedPacket?.signer && address !== "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" && address && selectedChainId) {
@@ -59,15 +61,22 @@ export const RedPacketItem = props => {
             getClaimBalances(item.id, item.address, true)
         }).catch(() => {
             message.error("claim failed")
+            setRedPacketObj((pre) => {
+                const obj = cloneDeep(pre);
+                obj[item.id].isLoadingComplete = true
+                return obj
+            })
         })
     }, [value, address, writeContracts, item]);
 
     const claimedNumber = useMemo(() => {
         if (item?.claimed_amount instanceof BigNumber) {
-            const num = Number(ethers.utils.formatUnits(item?.claimed_amount, 18)).toFixed(10)
-            if (Number(num) === 0) {
-                return Number(ethers.utils.formatUnits(item?.claimed_amount, 1)).toFixed(5)
-            }
+            const num = Number(ethers.utils.formatUnits(item?.claimed_amount, 18))
+            if (num > 10000) return num.toFixed(2)
+            if (num > 100) return num.toFixed(4)
+            if (num > 1) return num.toFixed(6)
+            if (num > 0.0001) return num.toFixed(8)
+            if (num > 0.00000001) return num.toFixed(12)
             return num
         }
         return item?.claimed_amount
@@ -164,18 +173,18 @@ export const RedPacketItem = props => {
                         position: "absolute",
                         left: 85,
                         top: 260,
-                        fontSize: !item?.isLoadingComplete ? 18 : (item?.disable ? 20 : 26),
+                        fontSize: !item?.isLoadingComplete ? 18 : (item?.disable || isExpire ? 20 : 26),
                         color: "white",
-                        cursor: item?.disable ? "no-drop" : "pointer",
+                        cursor: item?.disable || isExpire ? "no-drop" : "pointer",
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center"
                     }}
                     onClick={() => {
-                        if (item?.disable) return
+                        if (item?.disable || isExpire) return
                         setIsModalVisible(true);
                     }}>
-                    {!item?.isLoadingComplete ? "Loading" : (item?.isInList === false ? "Disable" : (item?.claimed ? "Claimed" : (item?.expired ? "Expired" : "Claim")))}
+                    {!item?.isLoadingComplete ? "Loading" : (item?.isInList === false ? "Disable" : (item?.claimed ? "Claimed" : ((item?.expired || isExpire) ? "Expired" : "Claim")))}
                 </div>
             </div>
 
