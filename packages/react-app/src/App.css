@@ -158,3 +158,19 @@
    inset -3px -3px 5px rgba(255,255,255,1);
   transition: box-shadow .2s ease-out;
 }
+
+@keyframes claimLoading
+{
+    from {
+      transform: rotateY(0deg);
+    }
+    to {
+      transform: rotateY(90deg);
+    }
+}
+
+.animate-claim-loading{
+  animation: claimLoading 0.3s linear infinite alternate;
+  /* Safari 与 Chrome: */
+  -webkit-animation-name: claimLoading 0.3s linear infinite alternate;
+}
