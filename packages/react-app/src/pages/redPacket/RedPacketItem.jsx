@@ -56,8 +56,7 @@ export const RedPacketItem = props => {
         })
         handleCancel()
         result.wait().then(() => {
-            message.success("claim successful")
-            getClaimBalances(item.id, item.address)
+            getClaimBalances(item.id, item.address, true)
         }).catch(() => {
             message.error("claim failed")
         })
