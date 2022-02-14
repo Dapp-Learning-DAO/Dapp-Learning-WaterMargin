@@ -36,7 +36,7 @@ export const RedPacket = props => {
           const response = JSON.parse(this.response);
           const response2 = [
             {
-              expireTime: new Date().valueOf() / 1000 + 10,
+              expireTime: new Date().valueOf() / 1000 + 1000,
               id: "0x98dfac8d1641c8aa56d1345f55023bda93a5255ffe6391bc0d9e0ddca3971471",
               name: "庆元旦，迎新春1",
               address: [
@@ -50,22 +50,8 @@ export const RedPacket = props => {
               ]
             },
             {
-              expireTime: new Date().valueOf() / 1000 + 20,
+              expireTime: new Date().valueOf() / 1000 + 2000,
               id: "0x351365b0cbcba278c08ce45d83585602abb7bac2c4e12098a16d5b022de85924",
-              name: "庆元旦，迎新春2",
-              address: [
-                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
-                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
-                "0x67Dcc2c5C25DD77983E0CA3dfd1aa33d1D8C0E43",
-                "0xf9e9476f7148adCCF577CdDCd2052EC2797757C4",
-                "0xfc2168D69BA0f2AE4E2B55FFDd7735Cdf3c9ccb6",
-                "0xE0c2bbdC9B1fd0a2c35854f0aCec8AB5c8BFFbBA",
-                "0x5DbeffE206A0623A3211e86b891BFA5f1CeDb47e"
-              ]
-            },
-            {
-              expireTime: new Date().valueOf() / 1000 + 40,
-              id: "0x49d4d94781709d909f74fc44898ac3f9397141ffb0a51240a4f8189bc1a75863",
               name: "庆元旦，迎新春2",
               address: [
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
@@ -79,6 +65,14 @@ export const RedPacket = props => {
             },{
               expireTime: new Date().valueOf() / 1000 + 4000,
               id: "0x001fc5be6d09ff6e93244daf30bdef243584dcb37749e74890a6500254c703c2",
+              name: "庆元旦，迎新春3",
+              address: [
+                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
+                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53"
+              ]
+            },{
+              expireTime: new Date().valueOf() / 1000 + 4000,
+              id: "0x19bbc1cdb7889e03618791e1cd6ca19ec31fd578f77d528d1218af71a372072c",
               name: "庆元旦，迎新春4",
               address: [
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
@@ -86,7 +80,7 @@ export const RedPacket = props => {
               ]
             }
           ]
-          const res = response
+          const res = response2
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
         };
