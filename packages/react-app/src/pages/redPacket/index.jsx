@@ -34,7 +34,7 @@ export const RedPacket = props => {
       xhr.onload = function () {
         if (this.status === 200) {
           const response = JSON.parse(this.response);
-          /* const response = [
+          const response2 = [
             {
               expireTime: new Date().valueOf() / 1000 + 10,
               id: "0x98dfac8d1641c8aa56d1345f55023bda93a5255ffe6391bc0d9e0ddca3971471",
@@ -76,18 +76,27 @@ export const RedPacket = props => {
                 "0xE0c2bbdC9B1fd0a2c35854f0aCec8AB5c8BFFbBA",
                 "0x5DbeffE206A0623A3211e86b891BFA5f1CeDb47e"
               ]
+            },{
+              expireTime: new Date().valueOf() / 1000 + 4000,
+              id: "0x001fc5be6d09ff6e93244daf30bdef243584dcb37749e74890a6500254c703c2",
+              name: "庆元旦，迎新春4",
+              address: [
+                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
+                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53"
+              ]
             }
-          ] */
-          setRedPacketObj(keyBy(response, "id"))
-          setRedPacketList(response)
-        }
-      };
+          ]
+          const res = response
+          setRedPacketObj(keyBy(res, "id"))
+          setRedPacketList(res)
+        };
+      }
     } catch (error) {
       console.log(error);
     }
   }, [])
 
-  const getClaimBalances = useCallback(async (id, addressList = [], isInterval) => {
+  const getClaimBalances = useCallback(async (id, addressList, isInterval) => {
     try {
       const balances = await writeContracts?.HappyRedPacket.check_availability(id)
       closeLoading()
