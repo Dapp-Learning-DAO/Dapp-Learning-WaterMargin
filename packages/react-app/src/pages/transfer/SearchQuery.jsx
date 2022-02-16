@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Select } from "antd";
 const { Option } = Select;
 
-export const SearchQuery = ({ list, setData, assets }) => {
+export const SearchQuery = ({ list, setData, assets, setPageNo }) => {
   const [{
     sort,
     owner,
@@ -50,12 +50,12 @@ export const SearchQuery = ({ list, setData, assets }) => {
     const nameList = tokenId ? ownerList?.filter(item => item?.tokenId["_hex"] === tokenId) : ownerList
     let sortList;
     if (sort === "id-desc") {
-      sortList = nameList?.sort((a, b) => parseInt(b?.blockNumber) - parseInt(a?.blockNumber));
+      sortList = nameList?.sort((a, b) => parseInt(b?.blockNumber) - parseInt(a?.blockNumber))?.filter(item=>assets && assets[parseInt(item.tokenId["_hex"])]?.description);
     } else {
-      sortList = nameList?.sort((a, b) => parseInt(a?.blockNumber) - parseInt(b?.blockNumber));
+      sortList = nameList?.sort((a, b) => parseInt(a?.blockNumber) - parseInt(b?.blockNumber))?.filter(item=>assets && assets[parseInt(item.tokenId["_hex"])]?.description);
     }
     setData(sortList)
-  }, [list, owner, tokenId, sort])
+  }, [list, owner, tokenId, sort, assets])
 
   return (
     <div style={{
@@ -71,6 +71,7 @@ export const SearchQuery = ({ list, setData, assets }) => {
         optionFilterProp="children"
         onChange={(val) => {
           setList((pre) => ({ ...pre, owner: val }))
+          setPageNo(1)
         }}
         onSearch={onSearch}
         filterOption={(input, option) =>
@@ -86,6 +87,7 @@ export const SearchQuery = ({ list, setData, assets }) => {
         optionFilterProp="children"
         onChange={(val) => {
           setList((pre) => ({ ...pre, tokenId: val }))
+          setPageNo(1)
         }}
       >
         {nameList?.map(item => <Option key={item} value={item}>{`${assets[parseInt(item)]?.description}`}</Option>)}
@@ -97,6 +99,7 @@ export const SearchQuery = ({ list, setData, assets }) => {
         optionFilterProp="children"
         onChange={(val) => {
           setList((pre) => ({ ...pre, sort: val }))
+          setPageNo(1)
         }}
       >
         {sortList?.map(item => <Option key={item.value} value={item?.value}>{item?.label}</Option>)}
