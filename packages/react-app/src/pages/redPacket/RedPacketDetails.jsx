@@ -82,10 +82,11 @@ export const RedPacketDetails = props => {
                     padding: 10,
                     display: 'flex',
                     justifyContent: "space-between",
-                    alignItems: "center"
+                    alignItems: "center",
+                    color: "#ceaa72"
                   }}>
                     <Address address={ite?.user} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={8} disableBlockies />
-                    <a
+                    { item?.token_address ? <a
                       href={tokenBalance(item?.token_address)}
                       target="_blank"
                       style={{
@@ -93,7 +94,7 @@ export const RedPacketDetails = props => {
                       }}
                     >
                       {ethers?.utils?.formatUnits(ite?.amount, 18)} DAI
-                  </a>
+                  </a> : <div>{ethers?.utils?.formatUnits(ite?.amount, 18)} DAI</div> }
                   </div>
                 )
               }) : <div
