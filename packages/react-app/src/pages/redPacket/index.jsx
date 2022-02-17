@@ -15,7 +15,8 @@ export const RedPacket = props => {
     address,
     tx,
     selectedChainId,
-    mainnetProvider
+    mainnetProvider,
+    web3Modal
   } = props;
 
   const blockExplorer = useMemo(() => {
@@ -26,7 +27,7 @@ export const RedPacket = props => {
 
   const [redPacketObj, setRedPacketObj] = useState({})
   const [redPacketList, setRedPacketList] = useState([])
-  const { closeLoading } = useLoading();
+  const { closeLoading, closeDelayLoading } = useLoading();
   const happyRedPacketsData = useQuery(happyRedPacketsGraph)
 
   useEffect(() => {
@@ -141,6 +142,10 @@ export const RedPacket = props => {
   }, [writeContracts?.HappyRedPacket, address, selectedChainId])
 
   useEffect(() => {
+    if (!web3Modal?.cachedProvider) closeDelayLoading()
+  }, [web3Modal])
+
+  useEffect(() => {
     // 从区块链获取合约红包的数据
     if (isEmpty(redPacketList) || !writeContracts?.HappyRedPacket || !writeContracts?.HappyRedPacket?.signer || address === "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" || !address || !selectedChainId) return
     for (let i = 0; i < redPacketList?.length; i++) {
@@ -179,6 +184,7 @@ export const RedPacket = props => {
                 getClaimredDetails={getClaimredDetails}
                 blockExplorer={blockExplorer}
                 mainnetProvider={mainnetProvider}
+                web3Modal={web3Modal}
               />
             );
           })}

@@ -871,6 +871,7 @@ function App(props) {
               writeContracts={writeContracts}
               address={address}
               selectedChainId={selectedChainId}
+              web3Modal={web3Modal}
               tx={tx}
             />
           </Route>

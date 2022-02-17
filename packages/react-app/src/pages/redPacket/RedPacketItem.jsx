@@ -22,7 +22,8 @@ export const RedPacketItem = props => {
         setRedPacketObj,
         selectedChainId,
         mainnetProvider,
-        blockExplorer
+        blockExplorer,
+        web3Modal
     } = props;
     const [isModalVisible, setIsModalVisible] = useState(false);
     //const isExpire = useIsExpire(item?.expireTime)
@@ -70,7 +71,7 @@ export const RedPacketItem = props => {
         })
     }, [address, writeContracts, item]);
 
-    const btnText = useMemo(() => !item?.isLoadingComplete ? "Loading" : (item?.isInList && !item?.expired && !item?.isClaimed ? "Claim" : "Details"), [item])
+    const btnText = useMemo(() => !item?.isLoadingComplete && web3Modal?.cachedProvider ? "Loading" : (item?.isInList && !item?.expired && !item?.isClaimed ? "Claim" : "Details"), [item])
 
     return (
         <>
@@ -154,7 +155,7 @@ export const RedPacketItem = props => {
                     </div>
                 </div>
                 <div
-                    className={!item?.isLoadingComplete ? "animate-claim-loading" : ""}
+                    className={!item?.isLoadingComplete && web3Modal?.cachedProvider ? "animate-claim-loading" : ""}
                     style={{
                         background: "#edcd98",
                         height: 80,
@@ -200,6 +201,7 @@ export const RedPacketItem = props => {
                     tokenBalance={tokenBalance}
                     blockExplorer={blockExplorer}
                     mainnetProvider={mainnetProvider}
+                    web3Modal={web3Modal}
                 />
             </Modal>
         </>
