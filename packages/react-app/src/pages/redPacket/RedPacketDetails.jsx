@@ -5,7 +5,7 @@ import { map } from "lodash"
 import { Address } from "../../components";
 
 export const RedPacketDetails = props => {
-  const { item, tokenBalance, mainnetProvider, blockExplorer } = props;
+  const { item, tokenBalance, mainnetProvider, blockExplorer, web3Modal } = props;
 
   /* useEffect(() => {
     console.log(item)
@@ -74,13 +74,15 @@ export const RedPacketDetails = props => {
             }}
           >
             {getClaimAmount(item?.claimed_amount2)} DAI
-          </a> : <div style={{ color: "rgba(0,0,0,0.4)", fontSize: 12 }}>当前地址不在红包名单内，无法领取</div>}
+          </a> : <div style={{ color: "rgba(0,0,0,0.4)", fontSize: 12 }}>
+            {web3Modal?.cachedProvider ? "The current address is not in list and cannot be claimed" : "Please connect network"}
+          </div>}
         </div>
         <div
           style={{
             borderTop: "5px solid #f1f1f1"
           }}>
-          <div style={{ padding: 10 }}>共{item?.address?.length}个红包，已领取{item?.claimers?.length || 0}个</div>
+          <div style={{ padding: 10 }}>Total {item?.address?.length} RedPacket，Claimed {item?.claimers?.length || 0}.</div>
           <div className="redPacketDetails" style={{ overflowY: "auto", maxHeight: 300 }}>
             {
               item?.claimers?.length > 0 ? map(item?.claimers, (ite, i) => {
@@ -112,7 +114,7 @@ export const RedPacketDetails = props => {
                   alignItems: "center",
                   color: "rgba(0,0,0,0.4)",
                   height: 100
-                }}>暂无人领取</div>
+                }}>No one has claimed</div>
             }
           </div>
         </div>
