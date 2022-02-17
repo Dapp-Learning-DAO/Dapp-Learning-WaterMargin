@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback } from "react";
 import { bgColor } from "../../theme";
 import { ethers } from "ethers";
 import { map } from "lodash"
@@ -10,6 +10,14 @@ export const RedPacketDetails = props => {
   /* useEffect(() => {
     console.log(item)
   }, [item]) */
+  const getClaimAmount = useCallback(
+    (amount) => {
+      const num = ethers?.utils?.formatUnits(amount, 18)
+      if (Number(num) > 1) {
+        return Number(num).toFixed(5)
+      }
+      return num
+    }, [item])
 
   return (
     <div
@@ -65,7 +73,7 @@ export const RedPacketDetails = props => {
               marginBottom: 10
             }}
           >
-            {item?.claimed_amount2} DAI
+            {getClaimAmount(item?.claimed_amount2)} DAI
           </a> : <div style={{ color: "rgba(0,0,0,0.4)", fontSize: 12 }}>当前地址不在红包名单内，无法领取</div>}
         </div>
         <div
@@ -93,8 +101,8 @@ export const RedPacketDetails = props => {
                         color: "#ceaa72"
                       }}
                     >
-                      {ethers?.utils?.formatUnits(ite?.amount, 18)} DAI
-                  </a> : <div>{ethers?.utils?.formatUnits(ite?.amount, 18)} DAI</div> }
+                      {getClaimAmount(ite?.amount)} DAI
+                  </a> : <div>{getClaimAmount(ite?.amount)} DAI</div>}
                   </div>
                 )
               }) : <div

@@ -27,13 +27,13 @@ export const RedPacketItem = props => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     //const isExpire = useIsExpire(item?.expireTime)
 
-    const getDatil = useCallback(() => {
+    const getDetails = useCallback(() => {
         if (item?.id && !item?.expired && item?.address && writeContracts?.HappyRedPacket && writeContracts?.HappyRedPacket?.signer && address !== "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" && address && selectedChainId) {
             getClaimredDetails(item.id, item.address)
         }
     }, [item?.id, item?.expired, writeContracts?.HappyRedPacket, address, selectedChainId])
 
-    usePoller(getDatil, 10000);
+    usePoller(getDetails, 10000);
 
     /* useEffect(() => {
         if (isExpire && item?.id && !item?.expired && item?.address && writeContracts?.HappyRedPacket && writeContracts?.HappyRedPacket?.signer && address !== "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" && address && selectedChainId) {
