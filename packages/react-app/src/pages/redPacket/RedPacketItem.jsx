@@ -31,7 +31,8 @@ export const RedPacketItem = props => {
     //const isExpire = useIsExpire(item?.expireTime)
     const happyRedPacketsData = useQuery(happyRedPacketsGraph, {
         variables: { redpacketID: item?.id },
-        pollInterval: 5000
+        pollInterval: 5000,
+        context: { clientName: 'RedPacket' }
     })
 
     useEffect(() => {
