@@ -96,6 +96,15 @@ module.exports = {
             runs: 200
           }
         }
+      },
+      {
+        version: "0.8.4",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       }
     ],
 
@@ -103,7 +112,7 @@ module.exports = {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: "12314"
+    apiKey: "123"
   },
   mocha: {
     timeout: 20000
