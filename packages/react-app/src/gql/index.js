@@ -26,7 +26,6 @@ const getCurrentColl = gql`
 
 const happyRedPacketsGraph = gql`
 query getRedPacket($redpacketID:Bytes){
-    {
       happyRedPackets(where: {id: $redpacketID} ) {
         id
         claimers {
