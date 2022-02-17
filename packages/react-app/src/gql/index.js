@@ -24,4 +24,17 @@ const getCurrentColl = gql`
 }
 `
 
-export { dappLearningCollectibles, getCurrentColl };
+const happyRedPacketsGraph = gql`
+    {
+      happyRedPackets(first: 5) {
+        id
+        claimers {
+          id
+          user
+          amount
+        }
+      }
+    }
+  `;
+
+export { dappLearningCollectibles, getCurrentColl, happyRedPacketsGraph };

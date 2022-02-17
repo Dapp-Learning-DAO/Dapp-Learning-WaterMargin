@@ -610,7 +610,7 @@ function App(props) {
           >
             <div style={{ position: "relative" }}>
               <div style={{ position: "absolute", top: "-22px" }}>Rank {parseInt(rank) + 1}:</div>
-              <div>{description}</div>
+              <div className="ellipsis" style={{ width: 200, textAlign: "left" }}>{description}</div>
             </div>
             {owner && (
               <Address

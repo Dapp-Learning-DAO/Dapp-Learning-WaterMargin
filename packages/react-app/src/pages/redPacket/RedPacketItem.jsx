@@ -1,15 +1,15 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { AddressInput } from "../../components";
+import React, { useState, useCallback, useMemo } from "react";
 import { Modal, message } from "antd";
 import { bgColor } from "../../theme";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import { hashToken } from "../../utils/getMerkleTree";
 import keccak256 from "keccak256";
 import { MerkleTree } from "merkletreejs";
 import { format } from "date-fns"
 import { cloneDeep } from "lodash"
 import { useIsExpire } from "./GetIsExpire"
-import { useLoading } from "../../components/Loading";
+import { RedPacketDetails } from "./RedPacketDetails";
+import { usePoller } from "eth-hooks";
 
 export const RedPacketItem = props => {
     const {
@@ -17,38 +17,40 @@ export const RedPacketItem = props => {
         address,
         item,
         tx,
-        mainnetProvider,
-        getClaimBalances,
+        getClaimredDetails,
         tokenBalance,
         setRedPacketObj,
-        selectedChainId
+        selectedChainId,
+        mainnetProvider,
+        blockExplorer
     } = props;
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const isExpire = useIsExpire(item?.expireTime)
-    const { closeLoading } = useLoading();
+    //const isExpire = useIsExpire(item?.expireTime)
 
-    useEffect(() => {
+    const getDetails = useCallback(() => {
+        if (item?.id && !item?.expired && item?.address && writeContracts?.HappyRedPacket && writeContracts?.HappyRedPacket?.signer && address !== "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" && address && selectedChainId) {
+            getClaimredDetails(item.id, item.address)
+        }
+    }, [item?.id, item?.expired, writeContracts?.HappyRedPacket, address, selectedChainId])
+
+    usePoller(getDetails, 10000);
+
+    /* useEffect(() => {
         if (isExpire && item?.id && !item?.expired && item?.address && writeContracts?.HappyRedPacket && writeContracts?.HappyRedPacket?.signer && address !== "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" && address && selectedChainId) {
             // 到过期的时间点再次请求一次
-            getClaimBalances(item.id, item.address)
+            getClaimredDetails(item.id, item.address)
         }
-    }, [isExpire, item?.id, item?.expired, writeContracts?.HappyRedPacket, address, selectedChainId])
+    }, [isExpire, item?.id, item?.expired, writeContracts?.HappyRedPacket, address, selectedChainId]) */
 
-    const [value, setValue] = useState()
-
-    const handleCancel = () => setIsModalVisible(false);
-
-    useEffect(() => setValue(address), [address])
-
-    const handleOk = useCallback(async () => {
-        if (!ethers.utils.isAddress(value)) {
+    const handleClaim = useCallback(async () => {
+        if (!ethers.utils.isAddress(address)) {
             message.warning("Please enter a well-formed address");
             return;
         }
         const merkleTree = new MerkleTree(item?.address?.map(address => hashToken(address)), keccak256, { sortPairs: true });
         let proof = merkleTree.getHexProof(hashToken(address));
         const result = await tx(
-            writeContracts.HappyRedPacket.claim(item.id, proof, value),
+            writeContracts.HappyRedPacket.claim(item.id, proof),
             true,
         );
         setRedPacketObj((pre) => {
@@ -56,9 +58,8 @@ export const RedPacketItem = props => {
             obj[item.id].isLoadingComplete = false
             return obj
         })
-        handleCancel()
         result.wait().then(() => {
-            getClaimBalances(item.id, item.address, true)
+            getClaimredDetails(item.id, item.address, true)
         }).catch(() => {
             message.error("claim failed")
             setRedPacketObj((pre) => {
@@ -67,27 +68,16 @@ export const RedPacketItem = props => {
                 return obj
             })
         })
-    }, [value, address, writeContracts, item]);
+    }, [address, writeContracts, item]);
 
-    const claimedNumber = useMemo(() => {
-        if (item?.claimed_amount instanceof BigNumber) {
-            const num = Number(ethers.utils.formatUnits(item?.claimed_amount, 18))
-            if (num > 10000) return num.toFixed(2)
-            if (num > 100) return num.toFixed(4)
-            if (num > 1) return num.toFixed(6)
-            if (num > 0.0001) return num.toFixed(8)
-            if (num > 0.00000001) return num.toFixed(12)
-            return num
-        }
-        return item?.claimed_amount
-    }, [item])
+    const btnText = useMemo(() => !item?.isLoadingComplete ? "Loading" : (item?.isInList && !item?.expired && !item?.isClaimed ? "Claim" : "Details"), [item])
 
     return (
         <>
             <div
                 className="cardBox"
                 style={{
-                    background: "#f25542",
+                    background: item?.isInList && !item?.isClaimed && !item?.expired ? "#f25542" : "#f25542",
                     boxShadow: "10px 10px 10px rgba(224,74,58,0.5)",
                     width: 250,
                     height: 375,
@@ -100,8 +90,8 @@ export const RedPacketItem = props => {
             >
                 <div
                     style={{
-                        background: `linear-gradient(to bottom, #f6604f, #f45e4d)`,
-                        boxShadow: "10px 10px 10px #e04a3a",
+                        background: item?.isInList && !item?.isClaimed && !item?.expired ? `linear-gradient(to bottom, #f6604f, #f45e4d)` : "#f56e5e",
+                        boxShadow: "0px 10px 10px #e04a3a",
                         width: 600,
                         height: 300,
                         borderBottomLeftRadius: 300,
@@ -121,7 +111,7 @@ export const RedPacketItem = props => {
                         position: "absolute",
                         left: 185,
                         top: 5
-                    }}>Dapp Learning 专属红包</div>
+                    }}>Dapp Learning 专属红包{`${item?.expired ? '(Expired)' : ""}`}</div>
                     <div style={{
                         width: 180,
                         height: 280,
@@ -135,7 +125,7 @@ export const RedPacketItem = props => {
                     }}>
                         <div>
                             <div>{item?.name}</div>
-                            {item?.claimed && item?.isInList && <div style={{ fontSize: 14 }}>claimed
+                            {item?.isClaimed && item?.isInList && <div style={{ fontSize: 14 }}>claimed
                                 <a
                                     href={tokenBalance(item?.token_address)}
                                     target="_blank"
@@ -144,7 +134,7 @@ export const RedPacketItem = props => {
                                         margin: "auto 5px"
                                     }}
                                 >
-                                    {claimedNumber}
+                                    {item?.claimed_amount}
                                 </a>
                         DAI
                       </div>}
@@ -173,35 +163,43 @@ export const RedPacketItem = props => {
                         position: "absolute",
                         left: 85,
                         top: 260,
-                        fontSize: !item?.isLoadingComplete ? 18 : (item?.disable || isExpire ? 20 : 26),
+                        fontSize: btnText === "Claim" ? 26 : 20,
                         color: "white",
-                        cursor: item?.disable || isExpire ? "no-drop" : "pointer",
+                        cursor: "pointer",
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center"
                     }}
                     onClick={() => {
-                        if (item?.disable || isExpire) return
-                        setIsModalVisible(true);
+                        if (btnText === "Claim") {
+                            handleClaim()
+                        } else {
+                            setIsModalVisible(true)
+                        }
                     }}>
-                    {!item?.isLoadingComplete ? "Loading" : (item?.isInList === false ? "Disable" : (item?.claimed ? "Claimed" : ((item?.expired || isExpire) ? "Expired" : "Claim")))}
+                    {btnText}
                 </div>
             </div>
 
             <Modal
-                title="Claim RedPacket"
-                okText={"Claim"}
-                cancelText="Cancel"
+                title={null}
+                bodyStyle={{
+                    padding: 0,
+                }}
+                style={{
+                    padding: 0,
+                }}
                 visible={isModalVisible}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                maskClosable={false}
+                footer={null}
+                closable={false}
+                width={400}
+                onCancel={() => setIsModalVisible(false)}
             >
-                <AddressInput
-                    ensProvider={mainnetProvider}
-                    placeholder="claim to address"
-                    value={value}
-                    onChange={setValue}
+                <RedPacketDetails
+                    item={item}
+                    tokenBalance={tokenBalance}
+                    blockExplorer={blockExplorer}
+                    mainnetProvider={mainnetProvider}
                 />
             </Modal>
         </>
