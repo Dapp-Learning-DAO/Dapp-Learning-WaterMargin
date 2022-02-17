@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Modal, message } from "antd";
 import { bgColor } from "../../theme";
 import { ethers } from "ethers";
@@ -6,10 +6,12 @@ import { hashToken } from "../../utils/getMerkleTree";
 import keccak256 from "keccak256";
 import { MerkleTree } from "merkletreejs";
 import { format } from "date-fns"
-import { cloneDeep } from "lodash"
+import { cloneDeep, map } from "lodash"
 import { useIsExpire } from "./GetIsExpire"
 import { RedPacketDetails } from "./RedPacketDetails";
 import { usePoller } from "eth-hooks";
+import { useQuery } from "@apollo/client";
+import { happyRedPacketsGraph } from "../../gql";
 
 export const RedPacketItem = props => {
     const {
@@ -27,6 +29,23 @@ export const RedPacketItem = props => {
     } = props;
     const [isModalVisible, setIsModalVisible] = useState(false);
     //const isExpire = useIsExpire(item?.expireTime)
+    const happyRedPacketsData = useQuery(happyRedPacketsGraph, {
+        variables: { redpacketID: item?.id },
+        pollInterval: 5000,
+        context: { clientName: 'RedPacket' }
+    })
+
+    useEffect(() => {
+        map(happyRedPacketsData?.data?.happyRedPackets, item => {
+            setRedPacketObj((pre) => {
+                const data = cloneDeep(pre);
+                if (item?.id && data[item?.id]) {
+                    data[item?.id].claimers = item.claimers || []
+                }
+                return data
+            })
+        })
+    }, [happyRedPacketsData?.data])
 
     const getDetails = useCallback(() => {
         if (item?.id && !item?.expired && item?.address && writeContracts?.HappyRedPacket && writeContracts?.HappyRedPacket?.signer && address !== "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" && address && selectedChainId) {

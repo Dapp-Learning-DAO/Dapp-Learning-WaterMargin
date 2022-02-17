@@ -6,8 +6,6 @@ import { keyBy, isEmpty, cloneDeep, map, find } from "lodash"
 import { NETWORKS } from "../../constants";
 import { useLoading } from "../../components/Loading";
 import { RedPacketItem } from "./RedPacketItem"
-import { happyRedPacketsGraph } from "../../gql";
-import { useQuery } from "@apollo/client";
 
 export const RedPacket = props => {
   const {
@@ -28,19 +26,6 @@ export const RedPacket = props => {
   const [redPacketObj, setRedPacketObj] = useState({})
   const [redPacketList, setRedPacketList] = useState([])
   const { closeLoading, closeDelayLoading } = useLoading();
-  const happyRedPacketsData = useQuery(happyRedPacketsGraph)
-
-  useEffect(() => {
-    map(happyRedPacketsData?.data?.happyRedPackets, item => {
-      setRedPacketObj((pre) => {
-        const data = cloneDeep(pre);
-        if (item?.id && data[item?.id]) {
-          data[item?.id].claimers = item.claimers || []
-        }
-        return data
-      })
-    })
-  }, [happyRedPacketsData?.data])
 
   useEffect(() => {
     try {
