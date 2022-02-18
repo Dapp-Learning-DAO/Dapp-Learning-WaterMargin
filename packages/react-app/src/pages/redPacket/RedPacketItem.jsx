@@ -100,6 +100,8 @@ export const RedPacketItem = props => {
         true,
       );
 
+      window.localStorage.setItem(item.id, "loading")
+
       result.wait().then(() => {
         getClaimRedDetails(item.id, item.address, true)
       }).catch(() => {

@@ -89,7 +89,7 @@ export const RedPacket = props => {
                 "0xFd7084a4bf147F8FE2A7eC8Ad20205B42FDc772E",
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033"
               ]
-            },{
+            }, {
               "name": "test",
               "id": String("0x9E89FBDA993931682D33899EFA17B5B27C0F0B98B2AA8D4184FD978F35C30F5F")?.toLowerCase(),
               "address": [
@@ -99,7 +99,7 @@ export const RedPacket = props => {
               ]
             }, {
               "name": "test2",
-              "id": String("0xBA5AFD041F0F477C09C4CBA74E7DD96639805A5308C2CC49EED10F914DFAE465")?.toLowerCase(),
+              "id": String("0x28852001aee40bfa773c22d7a6c0ff076f10ac7071dc742143a421fe6e70bac9")?.toLowerCase(),
               "address": [
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
                 "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
@@ -107,7 +107,7 @@ export const RedPacket = props => {
               ]
             }
           ]
-          const res = response3
+          const res = response
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
         };
@@ -120,7 +120,6 @@ export const RedPacket = props => {
   useEffect(() => {
     if (writeContracts?.HappyRedPacket && address) {
       writeContracts.HappyRedPacket.on('ClaimSuccess', (id, claimer, claimed_value, token_address) => {
-        console.log(id, claimer, claimed_value, token_address, "ClaimSuccess")
         if (String(claimer).toLowerCase() === String(address).toLowerCase()) {
           setRedPacketObj((pre) => {
             const obj = cloneDeep(pre);
@@ -146,7 +145,6 @@ export const RedPacket = props => {
       closeLoading()
       const isClaimed = Number(redDetails.claimed_amount) !== 0;
       const isInList = addressList?.indexOf(address) >= 0;
-      console.log(redDetails, id, writeContracts?.HappyRedPacket)
 
       //matic链遇到了申领上链后回调的redDetails?.claimed_amount依旧是零的情况，故如果是申领的时候，申领回调成功了，但是依旧是未申领的状态，则继续循环调用调用查询函数。
       //tx.wait().then是打包上链成功的回调还是交易提交到链上的回调？
@@ -159,6 +157,10 @@ export const RedPacket = props => {
         return
       }
 
+      if (isClaimed) window.localStorage.setItem(id, "");
+
+      const isLoading = window.localStorage.getItem(id);
+
       setRedPacketObj((pre) => {
         const obj = cloneDeep(pre);
         obj[id] = {
@@ -168,7 +170,7 @@ export const RedPacket = props => {
           expired: redDetails?.expired,
           token_address: redDetails?.token_address,
           isInList,
-          isLoadingComplete: true
+          isLoadingComplete: !isLoading
         }
         return obj
       })
