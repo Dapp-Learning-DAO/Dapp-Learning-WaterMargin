@@ -47,10 +47,8 @@ export const RedPacketItem = props => {
 
   useEffect(() => {
     if (readERC20Contracts && item?.id && ethers.constants.AddressZero !== readERC20Contracts?.address) {
-      console.log(readERC20Contracts)
       try {
         Promise.all([readERC20Contracts.decimals(), readERC20Contracts.symbol()]).then(res => {
-          console.log(res)
           setRedPacketObj((pre) => {
             const data = cloneDeep(pre);
             data[item?.id].decimals = res[0]
