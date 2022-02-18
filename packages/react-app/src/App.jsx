@@ -872,6 +872,7 @@ function App(props) {
               address={address}
               selectedChainId={selectedChainId}
               web3Modal={web3Modal}
+              localProvider={localProvider}
               tx={tx}
             />
           </Route>
