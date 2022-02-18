@@ -5,19 +5,7 @@ import { map } from "lodash"
 import { Address } from "../../components";
 
 export const RedPacketDetails = props => {
-  const { item, tokenBalance, mainnetProvider, blockExplorer, web3Modal } = props;
-
-  /* useEffect(() => {
-    console.log(item)
-  }, [item]) */
-  const getClaimAmount = useCallback(
-    (amount) => {
-      const num = ethers?.utils?.formatUnits(amount, 18)
-      if (Number(num) > 1) {
-        return Number(num).toFixed(5)
-      }
-      return num
-    }, [item])
+  const { item, tokenBalance, mainnetProvider, blockExplorer, web3Modal, address, claimedNumber } = props;
 
   return (
     <div
@@ -65,7 +53,7 @@ export const RedPacketDetails = props => {
           }}>
           <p>{item?.name}</p>
           {item?.isInList ? <a
-            href={tokenBalance(item?.token_address)}
+            href={tokenBalance(item?.token_address, address)}
             target="_blank"
             style={{
               fontSize: 20,
@@ -73,7 +61,7 @@ export const RedPacketDetails = props => {
               marginBottom: 10
             }}
           >
-            {getClaimAmount(item?.claimed_amount2)} DAI
+            {claimedNumber(item?.claimed_amount, item?.decimals)} {item?.symbol || " DAI"}
           </a> : <div style={{ color: "rgba(0,0,0,0.4)", fontSize: 12 }}>
             {web3Modal?.cachedProvider ? "The current address is not in list and cannot be claimed" : "Please connect network"}
           </div>}
@@ -97,14 +85,14 @@ export const RedPacketDetails = props => {
                   }}>
                     <Address address={ite?.user} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={8} disableBlockies />
                     { item?.token_address ? <a
-                      href={tokenBalance(item?.token_address)}
+                      href={tokenBalance(item?.token_address, ite?.user)}
                       target="_blank"
                       style={{
                         color: "#ceaa72"
                       }}
                     >
-                      {getClaimAmount(ite?.amount)} DAI
-                  </a> : <div>{getClaimAmount(ite?.amount)} DAI</div>}
+                      {claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " DAI"}
+                  </a> : <div>{claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " DAI"}</div>}
                   </div>
                 )
               }) : <div

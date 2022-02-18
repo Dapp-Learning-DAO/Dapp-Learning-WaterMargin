@@ -14,14 +14,15 @@ export const RedPacket = props => {
     tx,
     selectedChainId,
     mainnetProvider,
-    web3Modal
+    web3Modal,
+    localProvider
   } = props;
 
   const blockExplorer = useMemo(() => {
     return find(NETWORKS, item => String(item?.chainId) == String(selectedChainId))?.blockExplorer || ""
   }, [NETWORKS, selectedChainId])
 
-  const tokenBalance = (token_address) => `${blockExplorer || "https://etherscan.io/"}${"token/"}${token_address}?a=${address}`;
+  const tokenBalance = (token_address, userAddress) => `${blockExplorer || "https://etherscan.io/"}${"token/"}${token_address}?a=${userAddress}`;
 
   const [redPacketObj, setRedPacketObj] = useState({})
   const [redPacketList, setRedPacketList] = useState([])
@@ -46,28 +47,67 @@ export const RedPacket = props => {
               ]
             }, {
               id: "0x7f823877dc1acea194e4271dffb8f8f4643db5dffd2e642bf87ea17aef56443c",
-              name: "庆元旦，迎新春4",
+              name: "庆元旦，迎新春1",
               address: [
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
                 "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53"
               ]
             }, {
               id: "0x1227eb6c0bc19cb37cacdb9b6c105c5f00aaf109eaada7f98d6b646abdf9a6ff",
-              name: "庆元旦，迎新春4",
+              name: "庆元旦，迎新春2",
               address: [
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
                 "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53"
               ]
             }, {
-              id: "0xda67b67a7cbd4426372fb7732d008a0e0aed9b4bc4a14796e4dc94a254208ac6",
-              name: "庆元旦，迎新春4",
+              id: "0x759c692768271436d79d03c468b2cbdc612831793ec097db26fd6d953cbb14c6",
+              name: "庆元旦，迎新春6",
               address: [
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
-                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53"
+                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
+                "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
               ]
             }
           ]
-          const res = response
+          const response3 = [
+            {
+              "name": "218专场",
+              "id": "0xae8ee33ac7b211c65ac786355d87806ec88ba58d2f5f2447e58b99071e37e2bb",
+              "address": [
+                "0x3238f24e7C752398872B768Ace7dd63c54CfEFEc",
+                "0xa3F2Cf140F9446AC4a57E9B72986Ce081dB61E75",
+                "0xFd7084a4bf147F8FE2A7eC8Ad20205B42FDc772E",
+                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033"
+              ]
+            },
+            {
+              "name": "218专场plus",
+              "id": "0x81cc082bb0445c3aa55fe1ef111997014c8e6bc5892d7eb7195b98dbbfbcc18e",
+              "address": [
+                "0x3238f24e7C752398872B768Ace7dd63c54CfEFEc",
+                "0xa3F2Cf140F9446AC4a57E9B72986Ce081dB61E75",
+                "0xFd7084a4bf147F8FE2A7eC8Ad20205B42FDc772E",
+                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033"
+              ]
+            },{
+              "name": "test",
+              "id": String("0x9E89FBDA993931682D33899EFA17B5B27C0F0B98B2AA8D4184FD978F35C30F5F")?.toLowerCase(),
+              "address": [
+                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
+                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
+                "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
+              ]
+            }, {
+              "name": "test2",
+              "id": String("0xBA5AFD041F0F477C09C4CBA74E7DD96639805A5308C2CC49EED10F914DFAE465")?.toLowerCase(),
+              "address": [
+                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
+                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
+                "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
+              ]
+            }
+          ]
+          const res = response3
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
         };
@@ -77,22 +117,45 @@ export const RedPacket = props => {
     }
   }, [])
 
-  const getClaimredDetails = useCallback(async (id, addressList, isInterval) => {
+  useEffect(() => {
+    if (writeContracts?.HappyRedPacket && address) {
+      writeContracts.HappyRedPacket.on('ClaimSuccess', (id, claimer, claimed_value, token_address) => {
+        console.log(id, claimer, claimed_value, token_address, "ClaimSuccess")
+        if (String(claimer).toLowerCase() === String(address).toLowerCase()) {
+          setRedPacketObj((pre) => {
+            const obj = cloneDeep(pre);
+            obj[id] = {
+              ...obj[id],
+              isClaimed: true,
+              claimed_amount: claimed_value,
+              expired: false,
+              token_address: token_address,
+              isInList: true,
+              isLoadingComplete: true
+            }
+            return obj
+          })
+        }
+      });
+    }
+  }, [writeContracts?.HappyRedPacket, address])
+
+  const getClaimRedDetails = useCallback(async (id, addressList, isInterval) => {
     try {
       const redDetails = await writeContracts?.HappyRedPacket.check_availability(id)
       closeLoading()
-      const claimedAmount = claimedNumber(redDetails.claimed_amount)
-      const isClaimed = Number(claimedAmount) !== 0
-      const isInList = addressList?.indexOf(address) >= 0
+      const isClaimed = Number(redDetails.claimed_amount) !== 0;
+      const isInList = addressList?.indexOf(address) >= 0;
+      console.log(redDetails, id, writeContracts?.HappyRedPacket)
 
       //matic链遇到了申领上链后回调的redDetails?.claimed_amount依旧是零的情况，故如果是申领的时候，申领回调成功了，但是依旧是未申领的状态，则继续循环调用调用查询函数。
       //tx.wait().then是打包上链成功的回调还是交易提交到链上的回调？
       if (isInterval && !isClaimed) {
         let timer = setTimeout(() => {
-          getClaimredDetails(id, addressList, isInterval).then(() => {
+          getClaimRedDetails(id, addressList, true).then(() => {
             clearTimeout(timer)
           })
-        }, 2000)
+        }, 1000)
         return
       }
 
@@ -101,11 +164,7 @@ export const RedPacket = props => {
         obj[id] = {
           ...obj[id],
           isClaimed,
-          //balance: ethers?.utils?.formatUnits(redDetails?.claimed_amount, 18),
-          claimed_amount: claimedAmount,
-          claimed_amount2: redDetails?.claimed_amount,
-          //claimed: Number(ethers?.utils?.formatUnits(redDetails?.claimed, 0)),
-          //total: Number(ethers?.utils?.formatUnits(redDetails?.total, 0)),
+          claimed_amount: redDetails?.claimed_amount,
           expired: redDetails?.expired,
           token_address: redDetails?.token_address,
           isInList,
@@ -115,7 +174,6 @@ export const RedPacket = props => {
       })
     } catch (error) {
       console.log(error)
-      console.log("一般都是networkId与合约部署的networkId不一致造成的")
       closeLoading()
       setRedPacketObj((pre) => {
         const obj = cloneDeep(pre);
@@ -134,21 +192,14 @@ export const RedPacket = props => {
     // 从区块链获取合约红包的数据
     if (isEmpty(redPacketList) || !writeContracts?.HappyRedPacket || !writeContracts?.HappyRedPacket?.signer || address === "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" || !address || !selectedChainId) return
     for (let i = 0; i < redPacketList?.length; i++) {
-      getClaimredDetails(redPacketList[i]?.id, redPacketList[i]?.address)
+      getClaimRedDetails(redPacketList[i]?.id, redPacketList[i]?.address)
     }
   }, [redPacketList, writeContracts?.HappyRedPacket, address, selectedChainId])
 
-  const claimedNumber = useCallback((amount) => {
-    if (amount instanceof BigNumber) {
-      const num = Number(ethers.utils.formatUnits(amount, 18))
-      if (num > 10000) return num.toFixed(2)
-      if (num > 100) return num.toFixed(4)
-      if (num > 1) return num.toFixed(6)
-      if (num > 0.0001) return num.toFixed(8)
-      if (num > 0.00000001) return num.toFixed(12)
-      return num
-    }
-    return amount
+  const claimedNumber = useCallback((amount, decimals) => {
+    const num = Number(ethers.utils.formatUnits(amount, decimals || 18))
+    if (num > 1) return num.toFixed(5)
+    return ethers.utils.formatUnits(amount, decimals || 18)
   }, [])
 
   return (
@@ -166,10 +217,12 @@ export const RedPacket = props => {
                 selectedChainId={selectedChainId}
                 setRedPacketObj={setRedPacketObj}
                 tokenBalance={tokenBalance}
-                getClaimredDetails={getClaimredDetails}
+                getClaimRedDetails={getClaimRedDetails}
                 blockExplorer={blockExplorer}
                 mainnetProvider={mainnetProvider}
                 web3Modal={web3Modal}
+                localProvider={localProvider}
+                claimedNumber={claimedNumber}
               />
             );
           })}
