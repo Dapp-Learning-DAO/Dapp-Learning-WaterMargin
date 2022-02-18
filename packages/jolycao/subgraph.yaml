@@ -1,0 +1,30 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: HappyRedPacket
+    network: matic
+    source:
+      address: "0x7Da2533A4d255F4674e22Dc4114728a71F1ab120"
+      abi: HappyRedPacket
+      startBlock: 25051191
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - ClaimSuccess
+        - CreationSuccess
+        - RefundSuccess
+      abis:
+        - name: HappyRedPacket
+          file: ./abis/HappyRedPacket.json
+      eventHandlers:
+        - event: ClaimSuccess(bytes32,address,uint256,address)
+          handler: handleClaimSuccess
+        - event: CreationSuccess(uint256,bytes32,string,string,address,uint256,address,uint256,bool,uint256)
+          handler: handleCreationSuccess
+        - event: RefundSuccess(bytes32,address,uint256)
+          handler: handleRefundSuccess
+      file: ./src/mapping.ts
