@@ -1,6 +1,5 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { bgColor } from "../../theme";
-import { ethers } from "ethers";
 import { map } from "lodash"
 import { Address } from "../../components";
 
@@ -83,7 +82,7 @@ export const RedPacketDetails = props => {
                     alignItems: "center",
                     color: "#ceaa72"
                   }}>
-                    <Address address={ite?.user} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={8} disableBlockies />
+                    {ite?.user && <Address address={ite?.user} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={14} size={8} disableBlockies /> }
                     { item?.token_address ? <a
                       href={tokenBalance(item?.token_address, ite?.user)}
                       target="_blank"
@@ -92,7 +91,7 @@ export const RedPacketDetails = props => {
                       }}
                     >
                       {claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " DAI"}
-                  </a> : <div>{claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " DAI"}</div>}
+                    </a> : <div>{claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " DAI"}</div>}
                   </div>
                 )
               }) : <div
