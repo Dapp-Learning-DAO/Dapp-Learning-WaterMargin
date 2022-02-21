@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { mainWidth } from "../../theme";
 import StackGrid from "react-stack-grid";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import { keyBy, isEmpty, cloneDeep, map, find } from "lodash"
 import { NETWORKS } from "../../constants";
 import { useLoading } from "../../components/Loading";
 import { RedPacketItem } from "./RedPacketItem"
+import { mainWidth } from "../../theme";
 
 export const RedPacket = props => {
   const {
@@ -36,6 +36,7 @@ export const RedPacket = props => {
       xhr.onload = function () {
         if (this.status === 200) {
           const response = JSON.parse(this.response);
+          //kovan
           const response2 = [
             {
               "name": "虎年新春",
@@ -52,61 +53,10 @@ export const RedPacket = props => {
                 "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
                 "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53"
               ]
-            }, {
-              id: "0x1227eb6c0bc19cb37cacdb9b6c105c5f00aaf109eaada7f98d6b646abdf9a6ff",
-              name: "庆元旦，迎新春2",
-              address: [
-                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
-                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53"
-              ]
-            }, {
-              id: "0x759c692768271436d79d03c468b2cbdc612831793ec097db26fd6d953cbb14c6",
-              name: "庆元旦，迎新春6",
-              address: [
-                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
-                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
-                "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
-              ]
             }
           ]
-          const response3 = [
-            {
-              "name": "218专场",
-              "id": "0xae8ee33ac7b211c65ac786355d87806ec88ba58d2f5f2447e58b99071e37e2bb",
-              "address": [
-                "0x3238f24e7C752398872B768Ace7dd63c54CfEFEc",
-                "0xa3F2Cf140F9446AC4a57E9B72986Ce081dB61E75",
-                "0xFd7084a4bf147F8FE2A7eC8Ad20205B42FDc772E",
-                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033"
-              ]
-            },
-            {
-              "name": "218专场plus",
-              "id": "0x81cc082bb0445c3aa55fe1ef111997014c8e6bc5892d7eb7195b98dbbfbcc18e",
-              "address": [
-                "0x3238f24e7C752398872B768Ace7dd63c54CfEFEc",
-                "0xa3F2Cf140F9446AC4a57E9B72986Ce081dB61E75",
-                "0xFd7084a4bf147F8FE2A7eC8Ad20205B42FDc772E",
-                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033"
-              ]
-            }, {
-              "name": "test",
-              "id": String("0x9E89FBDA993931682D33899EFA17B5B27C0F0B98B2AA8D4184FD978F35C30F5F")?.toLowerCase(),
-              "address": [
-                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
-                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
-                "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
-              ]
-            }, {
-              "name": "test2",
-              "id": String("0x28852001aee40bfa773c22d7a6c0ff076f10ac7071dc742143a421fe6e70bac9")?.toLowerCase(),
-              "address": [
-                "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
-                "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
-                "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
-              ]
-            }
-          ]
+          //matic
+          const response3 = []
           const res = response
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
@@ -119,22 +69,21 @@ export const RedPacket = props => {
 
   useEffect(() => {
     if (writeContracts?.HappyRedPacket && address) {
-      writeContracts.HappyRedPacket.on('ClaimSuccess', (id, claimer, claimed_value, token_address) => {
-        if (String(claimer).toLowerCase() === String(address).toLowerCase()) {
-          setRedPacketObj((pre) => {
-            const obj = cloneDeep(pre);
+      writeContracts.HappyRedPacket.on('ClaimSuccess', (id, claimer, claimed_amount, token_address) => {
+        setRedPacketObj((pre) => {
+          const obj = cloneDeep(pre);
+          if (obj[id]) {
             obj[id] = {
               ...obj[id],
-              isClaimed: true,
-              claimed_amount: claimed_value,
+              isClaimed: String(claimer).toLowerCase() === String(address).toLowerCase(),
+              claimed_amount,
               expired: false,
-              token_address: token_address,
-              isInList: true,
+              token_address,
               isLoadingComplete: true
             }
-            return obj
-          })
-        }
+          }
+          return obj
+        })
       });
     }
   }, [writeContracts?.HappyRedPacket, address])
@@ -148,14 +97,14 @@ export const RedPacket = props => {
 
       //matic链遇到了申领上链后回调的redDetails?.claimed_amount依旧是零的情况，故如果是申领的时候，申领回调成功了，但是依旧是未申领的状态，则继续循环调用调用查询函数。
       //tx.wait().then是打包上链成功的回调还是交易提交到链上的回调？
-      if (isInterval && !isClaimed) {
+      /* if (isInterval && !isClaimed) {
         let timer = setTimeout(() => {
           getClaimRedDetails(id, addressList, true).then(() => {
             clearTimeout(timer)
           })
         }, 1000)
         return
-      }
+      } */
 
       if (isClaimed) window.localStorage.setItem(id, "");
 
@@ -191,7 +140,7 @@ export const RedPacket = props => {
   }, [web3Modal])
 
   useEffect(() => {
-    // 从区块链获取合约红包的数据
+    // 从区块链循环获取合约红包的数据（进入页面才获取）
     if (isEmpty(redPacketList) || !writeContracts?.HappyRedPacket || !writeContracts?.HappyRedPacket?.signer || address === "0x4533cC1B03AC05651C3a3d91d8538B7D3E66cbf0" || !address || !selectedChainId) return
     for (let i = 0; i < redPacketList?.length; i++) {
       getClaimRedDetails(redPacketList[i]?.id, redPacketList[i]?.address)
@@ -200,8 +149,7 @@ export const RedPacket = props => {
 
   const claimedNumber = useCallback((amount, decimals) => {
     const num = Number(ethers.utils.formatUnits(amount, decimals || 18))
-    if (num > 1) return num.toFixed(5)
-    return ethers.utils.formatUnits(amount, decimals || 18)
+    return num.toFixed(1)
   }, [])
 
   return (
@@ -216,7 +164,6 @@ export const RedPacket = props => {
                 address={address}
                 item={item}
                 tx={tx}
-                selectedChainId={selectedChainId}
                 setRedPacketObj={setRedPacketObj}
                 tokenBalance={tokenBalance}
                 getClaimRedDetails={getClaimRedDetails}

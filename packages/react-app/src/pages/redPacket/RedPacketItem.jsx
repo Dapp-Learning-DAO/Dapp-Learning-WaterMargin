@@ -7,9 +7,7 @@ import keccak256 from "keccak256";
 import { MerkleTree } from "merkletreejs";
 import { format } from "date-fns"
 import { cloneDeep, map, isEmpty } from "lodash"
-import { useIsExpire } from "./GetIsExpire"
 import { RedPacketDetails } from "./RedPacketDetails";
-import { usePoller } from "eth-hooks";
 import { useQuery } from "@apollo/client";
 import { happyRedPacketsGraph } from "../../gql";
 
@@ -93,10 +91,7 @@ export const RedPacketItem = props => {
 
       const merkleTree = new MerkleTree(item?.address?.map(address => hashToken(address)), keccak256, { sortPairs: true });
       let proof = merkleTree.getHexProof(hashToken(address));
-      const result = await tx(
-        writeContracts.HappyRedPacket.claim(item.id, proof),
-        true,
-      );
+      const result = await tx(writeContracts.HappyRedPacket.claim(item.id, proof), true);
 
       window.localStorage.setItem(item.id, "loading")
 
@@ -118,7 +113,7 @@ export const RedPacketItem = props => {
       <div
         className="cardBox"
         style={{
-          background: item?.isInList && !item?.isClaimed && !item?.expired ? "#f25542" : "#f25542",
+          background: "#f25542",
           boxShadow: "10px 10px 10px rgba(224,74,58,0.5)",
           width: 250,
           height: 375,
