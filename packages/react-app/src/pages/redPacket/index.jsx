@@ -149,8 +149,7 @@ export const RedPacket = props => {
 
   const claimedNumber = useCallback((amount, decimals) => {
     const num = Number(ethers.utils.formatUnits(amount, decimals || 18))
-    if (num > 1) return num.toFixed(5)
-    return ethers.utils.formatUnits(amount, decimals || 18)
+    return num.toFixed(1)
   }, [])
 
   return (
