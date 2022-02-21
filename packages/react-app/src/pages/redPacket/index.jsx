@@ -74,7 +74,7 @@ export const RedPacket = props => {
               "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
             ]
           }]
-          const res = response
+          const res = response3
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
         };
@@ -87,7 +87,7 @@ export const RedPacket = props => {
   useEffect(() => {
     if (writeContracts?.HappyRedPacket && address) {
       writeContracts.HappyRedPacket.on('ClaimSuccess', (id, claimer, claimed_amount, token_address) => {
-        window.localStorage.setItem(`${address}_${id}`, "");
+        //window.localStorage.setItem(`${address}_${id}`, "");
         setRedPacketObj((pre) => {
           const obj = cloneDeep(pre);
           if (obj[id]) {
@@ -112,24 +112,12 @@ export const RedPacket = props => {
       closeLoading()
       const isClaimed = Number(redDetails.claimed_amount) !== 0;
       const isInList = addressList?.indexOf(address) >= 0;
-      console.log(redDetails, isClaimed, isInList)
-
-      //matic链遇到了申领上链后回调的redDetails?.claimed_amount依旧是零的情况，故如果是申领的时候，申领回调成功了，但是依旧是未申领的状态，则继续循环调用调用查询函数。
-      //tx.wait().then是打包上链成功的回调还是交易提交到链上的回调？
-      /* if (isInterval && !isClaimed) {
-        let timer = setTimeout(() => {
-          getClaimRedDetails(id, addressList, true).then(() => {
-            clearTimeout(timer)
-          })
-        }, 1000)
-        return
-      } */
 
       //如果此时领取了，那么就重置该值为非loading
-      if (isClaimed) window.localStorage.setItem(`${address}_${id}`, "");
+      //if (isClaimed) window.localStorage.setItem(`${address}_${id}`, "");
 
       //获取这个值是否是loading来决定前端显示的状态
-      const isLoading = window.localStorage.getItem(`${address}_${id}`) === "loading";
+      //const isLoading = window.localStorage.getItem(`${address}_${id}`) === "loading";
 
       setRedPacketObj((pre) => {
         const obj = cloneDeep(pre);
@@ -140,19 +128,14 @@ export const RedPacket = props => {
           expired: redDetails?.expired,
           token_address: redDetails?.token_address,
           isInList,
-          isLoadingComplete: !isLoading
+          isLoadingComplete: true//!isLoading
         }
         return obj
       })
     } catch (error) {
       console.log(error)
       closeLoading()
-      setRedPacketObj((pre) => {
-        const obj = cloneDeep(pre);
-        obj[id].isLoadingComplete = true
-        obj[id].isInList = false
-        return obj
-      })
+      getClaimRedDetails(id, addressList)
     }
   }, [writeContracts?.HappyRedPacket, address, selectedChainId])
 
