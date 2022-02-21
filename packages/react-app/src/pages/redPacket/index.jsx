@@ -74,7 +74,7 @@ export const RedPacket = props => {
               "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
             ]
           }]
-          const res = response3
+          const res = response
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
         };
