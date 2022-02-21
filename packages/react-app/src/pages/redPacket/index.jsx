@@ -74,7 +74,7 @@ export const RedPacket = props => {
               "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
             ]
           }]
-          const res = response
+          const res = response3
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
         };
@@ -87,7 +87,7 @@ export const RedPacket = props => {
   useEffect(() => {
     if (writeContracts?.HappyRedPacket && address) {
       writeContracts.HappyRedPacket.on('ClaimSuccess', (id, claimer, claimed_amount, token_address) => {
-        window.localStorage.setItem(`${address}_${id}`, "");
+        //window.localStorage.setItem(`${address}_${id}`, "");
         setRedPacketObj((pre) => {
           const obj = cloneDeep(pre);
           if (obj[id]) {
@@ -126,10 +126,10 @@ export const RedPacket = props => {
       } */
 
       //如果此时领取了，那么就重置该值为非loading
-      if (isClaimed) window.localStorage.setItem(`${address}_${id}`, "");
+      //if (isClaimed) window.localStorage.setItem(`${address}_${id}`, "");
 
       //获取这个值是否是loading来决定前端显示的状态
-      const isLoading = window.localStorage.getItem(`${address}_${id}`) === "loading";
+      //const isLoading = window.localStorage.getItem(`${address}_${id}`) === "loading";
 
       setRedPacketObj((pre) => {
         const obj = cloneDeep(pre);
@@ -140,7 +140,7 @@ export const RedPacket = props => {
           expired: redDetails?.expired,
           token_address: redDetails?.token_address,
           isInList,
-          isLoadingComplete: !isLoading
+          isLoadingComplete: true//!isLoading
         }
         return obj
       })

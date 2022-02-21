@@ -94,18 +94,18 @@ export const RedPacketItem = props => {
       const result = await tx(writeContracts.HappyRedPacket.claim(item.id, proof), true);
 
       // 某个用户在某个红包id点击领取后，临时存储值为loading，目的在于用户刷新后读取该值。
-      window.localStorage.setItem(`${address}_${item.id}`, "loading")
+      //window.localStorage.setItem(`${address}_${item.id}`, "loading")
 
       result.wait().then(() => {
         getClaimRedDetails(item.id, item.address, true)
       }).catch(() => {
         message.error("claim failed")
-        window.localStorage.setItem(`${address}_${item.id}`, "")
+        //window.localStorage.setItem(`${address}_${item.id}`, "")
         loading(item?.id, false)
       })
     } catch (error) {
       loading(item?.id, false)
-      window.localStorage.setItem(`${address}_${item.id}`, "")
+      //window.localStorage.setItem(`${address}_${item.id}`, "")
     }
   }, [address, writeContracts, item]);
 
