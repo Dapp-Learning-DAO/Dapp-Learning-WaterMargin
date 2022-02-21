@@ -56,7 +56,24 @@ export const RedPacket = props => {
             }
           ]
           //matic
-          const response3 = []
+          const response3 = [{
+            "name": "虎年新春",
+            "id": "0x823cf15d9131305cc1f1310e4eec8c2b23d5de128d5fdbcc0711a10d37951c45",
+            "address": [
+              "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
+              "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
+              "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
+            ]
+          },
+          {
+            "name": "虎年新春",
+            "id": String("0x4AAB273E093E8BDB7619F6A205BA9E54EEAD1DC85F602AAE02F3DC33D0F0E7D5").toLowerCase(),
+            "address": [
+              "0xf0A3FdF9dC875041DFCF90ae81D7E01Ed9Bc2033",
+              "0x2FB2320BbdD9f6b8AD5a3821eF49A1668f668c53",
+              "0x573450522Edfdc89B380Fa250EDEdff08c817Fd5"
+            ]
+          }]
           const res = response
           setRedPacketObj(keyBy(res, "id"))
           setRedPacketList(res)
@@ -70,6 +87,7 @@ export const RedPacket = props => {
   useEffect(() => {
     if (writeContracts?.HappyRedPacket && address) {
       writeContracts.HappyRedPacket.on('ClaimSuccess', (id, claimer, claimed_amount, token_address) => {
+        window.localStorage.setItem(`${address}_${id}`, "");
         setRedPacketObj((pre) => {
           const obj = cloneDeep(pre);
           if (obj[id]) {
@@ -88,12 +106,13 @@ export const RedPacket = props => {
     }
   }, [writeContracts?.HappyRedPacket, address])
 
-  const getClaimRedDetails = useCallback(async (id, addressList, isInterval) => {
+  const getClaimRedDetails = useCallback(async (id, addressList) => {
     try {
       const redDetails = await writeContracts?.HappyRedPacket.check_availability(id)
       closeLoading()
       const isClaimed = Number(redDetails.claimed_amount) !== 0;
       const isInList = addressList?.indexOf(address) >= 0;
+      console.log(redDetails, isClaimed, isInList)
 
       //matic链遇到了申领上链后回调的redDetails?.claimed_amount依旧是零的情况，故如果是申领的时候，申领回调成功了，但是依旧是未申领的状态，则继续循环调用调用查询函数。
       //tx.wait().then是打包上链成功的回调还是交易提交到链上的回调？
@@ -106,9 +125,11 @@ export const RedPacket = props => {
         return
       } */
 
-      if (isClaimed) window.localStorage.setItem(id, "");
+      //如果此时领取了，那么就重置该值为非loading
+      if (isClaimed) window.localStorage.setItem(`${address}_${id}`, "");
 
-      const isLoading = window.localStorage.getItem(id);
+      //获取这个值是否是loading来决定前端显示的状态
+      const isLoading = window.localStorage.getItem(`${address}_${id}`) === "loading";
 
       setRedPacketObj((pre) => {
         const obj = cloneDeep(pre);

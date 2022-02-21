@@ -93,16 +93,19 @@ export const RedPacketItem = props => {
       let proof = merkleTree.getHexProof(hashToken(address));
       const result = await tx(writeContracts.HappyRedPacket.claim(item.id, proof), true);
 
-      window.localStorage.setItem(item.id, "loading")
+      // 某个用户在某个红包id点击领取后，临时存储值为loading，目的在于用户刷新后读取该值。
+      window.localStorage.setItem(`${address}_${item.id}`, "loading")
 
       result.wait().then(() => {
         getClaimRedDetails(item.id, item.address, true)
       }).catch(() => {
         message.error("claim failed")
-        loading(item.id, false)
+        window.localStorage.setItem(`${address}_${item.id}`, "")
+        loading(item?.id, false)
       })
     } catch (error) {
-      loading(item.id, false)
+      loading(item?.id, false)
+      window.localStorage.setItem(`${address}_${item.id}`, "")
     }
   }, [address, writeContracts, item]);
 
