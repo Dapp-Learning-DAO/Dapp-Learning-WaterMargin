@@ -31,7 +31,7 @@ export const RedPacket = props => {
   useEffect(() => {
     try {
       const xhr = new XMLHttpRequest();
-      xhr.open("GET", "http://81.69.8.95/WaterMarginJson/redpacket.json", true);
+      xhr.open("GET", `http://81.69.8.95/WaterMarginJson/redpacket.json?t=${Math.random()}`, true);
       xhr.send();
       xhr.onload = function () {
         if (this.status === 200) {
