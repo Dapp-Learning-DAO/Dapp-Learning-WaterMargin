@@ -175,7 +175,7 @@ export const RedPacketItem = props => {
                 >
                   {Number(claimedNumber(item?.claimed_amount, item?.decimals))}
                 </a>
-                {item?.symbol || "DAI"}
+                {item?.symbol || "USDC"}
               </div>}
             </div>
           </div>

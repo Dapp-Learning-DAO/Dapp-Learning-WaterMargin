@@ -60,7 +60,7 @@ export const RedPacketDetails = props => {
               marginBottom: 10
             }}
           >
-            {claimedNumber(item?.claimed_amount, item?.decimals)} {item?.symbol || " DAI"}
+            {claimedNumber(item?.claimed_amount, item?.decimals)} {item?.symbol || " USDC"}
           </a> : <div style={{ color: "rgba(0,0,0,0.4)", fontSize: 12 }}>
             {web3Modal?.cachedProvider ? "The current address is not in list and cannot be claimed" : "Please connect network"}
           </div>}
@@ -90,8 +90,8 @@ export const RedPacketDetails = props => {
                         color: "#ceaa72"
                       }}
                     >
-                      {claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " DAI"}
-                    </a> : <div>{claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " DAI"}</div>}
+                      {claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " USDC"}
+                    </a> : <div>{claimedNumber(ite?.amount, item?.decimals)} {item?.symbol || " USDC"}</div>}
                   </div>
                 )
               }) : <div

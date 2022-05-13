@@ -111,7 +111,7 @@ export const RedPacket = props => {
       const redDetails = await writeContracts?.HappyRedPacket.check_availability(id)
       closeLoading()
       const isClaimed = Number(redDetails.claimed_amount) !== 0;
-      const isInList = addressList?.indexOf(address) >= 0;
+      const isInList = addressList.map(ite => ite?.toLowerCase())?.indexOf(address?.toLowerCase()) >= 0;
 
       //如果此时领取了，那么就重置该值为非loading
       //if (isClaimed) window.localStorage.setItem(`${address}_${id}`, "");
@@ -152,7 +152,7 @@ export const RedPacket = props => {
   }, [redPacketList, writeContracts?.HappyRedPacket, address, selectedChainId])
 
   const claimedNumber = useCallback((amount, decimals) => {
-    const num = Number(ethers.utils.formatUnits(amount, decimals || 18))
+    const num = Number(ethers.utils.formatUnits(amount, decimals || 6))
     return num.toFixed(1)
   }, [])
 
